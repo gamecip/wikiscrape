@@ -24,6 +24,20 @@ public class QueryBuilder {
 	 */
 	public String getQueryTerm(String passedQueryParameter, String... passedQueryArguments) {
 		String queryParameters = StringUtilities.concatenateStrings("|", passedQueryArguments);
-		return String.format("%s=%s", passedQueryParameter, queryParameters);
+		return getQueryTerm(passedQueryParameter, queryParameters);
+	}
+	
+	/**
+	 * Returns a single String-form query term using the passed query parameter String and the single
+	 * passed argument String.
+	 * 
+	 * Format of the returned String will be {@code "queryParameter=queryArgument}
+	 * 
+	 * @param passedQueryParameter - The Wiki-defined query parameter to be used
+	 * @param passedQueryArgument - The argument to be passed to the aforementioned query
+	 * @return A suitably formatted API query term
+	 */
+	public String getQueryTerm(String passedQueryParameter, String passedQueryArgument) {
+		return String.format("%s=%s", passedQueryParameter, passedQueryArgument);
 	}
 }
