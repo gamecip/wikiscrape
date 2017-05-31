@@ -33,7 +33,7 @@ public class QueryFactory {
 		}
 	}
 	
-	public static String getBaseQuery(PageSpecification passedPageSpecification, String ... passedPageStrings) {
+	public static String getQueryURL(PageSpecification passedPageSpecification, String ... passedPageStrings) {
 		String baseURL = String.format("%s%s", ScraperConfig.WIKI_URL, StringUtilities.getQueryTerm(ACTION, QUERY));
 		String pageSpecification = StringUtilities.getQueryTerm(passedPageSpecification.getType(), passedPageStrings);
 		return StringUtilities.concatenateCommands(baseURL, pageSpecification);
