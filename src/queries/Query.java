@@ -19,8 +19,8 @@ import utilities.StringUtilities;
 public class Query {
 
 	// Local values
-	private String SYNTAX_COMMAND;
-	private String SYNTAX_RESULT;
+	private String COMMAND;
+	private String RESULT;
 	private String[] ARGUMENTS;
 	private List<Query> OPTIONS;
 
@@ -39,23 +39,40 @@ public class Query {
 	/**
 	 * Constructs a new {@link Query} without arguments or options, with the passed command and result syntaxes.
 	 * 
-	 * @param passedCommandSyntax - The syntax of the 
-	 * @param passedResultSyntax
+	 * @param passedCommandSyntax - The syntax of the command to be used
+	 * @param passedResultSyntax - The expected result field given a successful query
 	 */
 	public Query(String passedCommandSyntax, String passedResultSyntax) {
 		this(passedCommandSyntax, passedResultSyntax, null, (Query[])null);
 	}
 	
+	/**
+	 * Constructs a new {@link Query} with the passed arguments and no options.
+	 * 
+	 * @param passedCommandSyntax - The syntax of the command to be used
+	 * @param passedResultSyntax - The expected result field given a successful query
+	 * @param passedArguments - The arguments to be used for this command
+	 */
 	public Query(String passedCommandSyntax, String passedResultSyntax, String[] passedArguments) {
 		this(passedCommandSyntax, passedResultSyntax, passedArguments, (Query[])null);
 	}
 
+	/**
+	 * Constructs a new {@link Query} with the passed arguments and options.
+	 * 
+	 * @param passedCommandSyntax - The syntax of the command to be used
+	 * @param passedResultSyntax - The expected result field given a successful query
+	 * @param passedArguments - The arguments to be used for this command
+	 * @param passedOptions - The attached {@link Query}s to be used as options.
+	 */
 	public Query(String passedCommandSyntax, String passedResultSyntax, String[] passedArguments, Query... passedOptions) {
-		this.SYNTAX_COMMAND = passedCommandSyntax;
-		this.SYNTAX_RESULT = passedResultSyntax;
+		this.COMMAND = passedCommandSyntax;
+		this.RESULT = passedResultSyntax;
 		this.setArguments(passedArguments);
 		this.setOptions(passedOptions);
 		this.CHANGED_RESULTS = true;
+		this.CHANGED_ARGUMENTS = true;
+		this.CHANGED_OPTIONS = true;
 	}
 	
 	/**
@@ -131,7 +148,7 @@ public class Query {
 	 * @return The syntax of this command.
 	 */
 	public String getCommand() {
-		return this.SYNTAX_COMMAND;
+		return this.COMMAND;
 	}
 
 	/**
@@ -141,7 +158,7 @@ public class Query {
 	 * @return The result key for this {@link Query}.
 	 */
 	public String getResult() {
-		return this.SYNTAX_RESULT;
+		return this.RESULT;
 	}
 
 	/**
@@ -164,7 +181,7 @@ public class Query {
 	
 	@Override
 	public Query clone() {
-		Query newQuery = new Query(this.SYNTAX_COMMAND, this.SYNTAX_RESULT, this.ARGUMENTS, this.OPTIONS.toArray(new Query[]{}));
+		Query newQuery = new Query(this.COMMAND, this.RESULT, this.ARGUMENTS, this.OPTIONS.toArray(new Query[]{}));
 		newQuery.setCacheArguments(this.buildArguments());
 		newQuery.setCacheCommand(this.buildCommand());
 		newQuery.setCacheOptions(this.buildOptions());
@@ -204,10 +221,10 @@ public class Query {
 	private String buildCommand() {
 		if (this.CHANGED_ARGUMENTS) {
 			if (this.hasArguments()) {
-				this.CACHE_COMMAND = StringUtilities.getQueryTerm(this.SYNTAX_COMMAND, this.buildArguments());
+				this.CACHE_COMMAND = StringUtilities.getQueryTerm(this.COMMAND, this.buildArguments());
 			}
 			else {
-				this.CACHE_COMMAND = this.SYNTAX_COMMAND;
+				this.CACHE_COMMAND = this.COMMAND;
 			}
 		}
 		this.CHANGED_ARGUMENTS = false;
