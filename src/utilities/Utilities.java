@@ -1,8 +1,10 @@
 package utilities;
 
-public class StringUtilities {
+import java.util.Arrays;
 
-	private StringUtilities() {
+public class Utilities {
+
+	private Utilities() {
 	};
 
 	/**
@@ -36,7 +38,7 @@ public class StringUtilities {
 	 */
 	public static String getQueryTerm(String passedQueryParameter, String... passedQueryArguments) {
 		String queryParameters = concatenateArguments(passedQueryArguments);
-		return StringUtilities.getQueryTerm(passedQueryParameter, queryParameters);
+		return Utilities.getQueryTerm(passedQueryParameter, queryParameters);
 	}
 
 	/**
@@ -71,6 +73,19 @@ public class StringUtilities {
 	 */
 	public static String concatenateCommands(String ... passedCommandStrings) {
 		return concatenateStrings("&", passedCommandStrings);
+	}
+	
+	/**
+	 * Joins the two passed arrays.
+	 * 
+	 * @param passedFirstArray - The first array
+	 * @param passedSecondArray - The array to join with the second array.
+	 * @return A new array consisting of the joined arrays.
+	 */
+	public static <Type> Type[] joinArrays(Type[] passedFirstArray, Type[] passedSecondArray) {
+		Type[] joinedArray = Arrays.copyOf(passedFirstArray, passedFirstArray.length + passedSecondArray.length);
+		System.arraycopy(passedSecondArray, 0, joinedArray, passedFirstArray.length, passedSecondArray.length);
+		return joinedArray;
 	}
  
 }

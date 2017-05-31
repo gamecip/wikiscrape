@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import utilities.StringUtilities;
+import utilities.Utilities;
 
 /**
  * Flexible class for defining a wiki api query.
@@ -221,7 +221,7 @@ public class Query {
 	private String buildCommand() {
 		if (this.CHANGED_ARGUMENTS) {
 			if (this.hasArguments()) {
-				this.CACHE_COMMAND = StringUtilities.getQueryTerm(this.COMMAND, this.buildArguments());
+				this.CACHE_COMMAND = Utilities.getQueryTerm(this.COMMAND, this.buildArguments());
 			}
 			else {
 				this.CACHE_COMMAND = this.COMMAND;
@@ -268,14 +268,8 @@ public class Query {
 		return (passedString != null) && (!passedString.isEmpty());
 	}
 
-	private static <Type> Type[] joinArrays(Type[] passedFirstArray, Type[] passedSecondArray) {
-		Type[] joinedArray = Arrays.copyOf(passedFirstArray, passedFirstArray.length + passedSecondArray.length);
-		System.arraycopy(passedSecondArray, 0, joinedArray, passedFirstArray.length, passedSecondArray.length);
-		return joinedArray;
-	}
-
 	private static String concatenateArguments(String... passedStrings) {
-		return StringUtilities.concatenateStrings("|", passedStrings);
+		return Utilities.concatenateStrings("|", passedStrings);
 	}
 	
 	private static String concatenateArguments(Argument ... passedArguments) {
@@ -283,7 +277,7 @@ public class Query {
 	}
 
 	private static String concatenateOptions(String... passedStrings) {
-		return StringUtilities.concatenateStrings("&", passedStrings);
+		return Utilities.concatenateStrings("&", passedStrings);
 	}
 	
 	private static String[] buildArgumentArray(Argument ... passedArguments) {

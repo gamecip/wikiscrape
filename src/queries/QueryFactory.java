@@ -1,6 +1,6 @@
 package queries;
 
-import utilities.StringUtilities;
+import utilities.Utilities;
 import wikiscrape.ScraperConfig;
 
 /**
@@ -34,9 +34,9 @@ public class QueryFactory {
 	}
 	
 	public static String getQueryURL(PageSpecification passedPageSpecification, String ... passedPageStrings) {
-		String baseURL = String.format("%s%s", ScraperConfig.WIKI_URL, StringUtilities.getQueryTerm(ACTION, QUERY));
-		String pageSpecification = StringUtilities.getQueryTerm(passedPageSpecification.getType(), passedPageStrings);
-		return StringUtilities.concatenateCommands(baseURL, pageSpecification);
+		String baseURL = String.format("%s%s", ScraperConfig.WIKI_URL, Utilities.getQueryTerm(ACTION, QUERY));
+		String pageSpecification = Utilities.getQueryTerm(passedPageSpecification.getType(), passedPageStrings);
+		return Utilities.concatenateCommands(baseURL, pageSpecification);
 	}
 
 //	/* Revision metadata queries */
