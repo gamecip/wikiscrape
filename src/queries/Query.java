@@ -7,6 +7,15 @@ import java.util.List;
 
 import utilities.StringUtilities;
 
+/**
+ * Flexible class for defining a wiki api query.
+ * 
+ * Recursive - supports adding other Query objects as options.
+ * 
+ * Various levels of caching are used to avoid rebuilding Strings when mutable aspects are changed, i.e. the arguments of the command or the options passed to it.
+ * 
+ * @author Malcolm Riley
+ */
 public class Query {
 
 	// Local values
@@ -16,16 +25,16 @@ public class Query {
 	private List<Query> OPTIONS;
 
 	// Cached Results
-	private String CACHE_FINALIZED = null;
+	private String CACHE_FINAL = null;
 	private String CACHE_COMMAND = null;
 	private String CACHE_ARGUMENTS = null;
 	private String CACHE_OPTIONS = null;
 	private String[] CACHE_RESULT;
 
 	// Change tracking
-	private boolean RESULTS_CHANGED = true;
-	private boolean ARGUMENTS_CHANGED = true;
-	private boolean OPTIONS_CHANGED = true;
+	private boolean CHANGED_RESULTS = true;
+	private boolean CHANGED_ARGUMENTS = true;
+	private boolean CHANGED_OPTIONS = true;
 
 	/**
 	 * Constructs a new {@link Query} without arguments or options, with the passed command and result syntaxes.
@@ -46,7 +55,7 @@ public class Query {
 		this.SYNTAX_RESULT = passedResultSyntax;
 		this.setArguments(passedArguments);
 		this.setOptions(passedOptions);
-		this.RESULTS_CHANGED = true;
+		this.CHANGED_RESULTS = true;
 	}
 	
 	/**
@@ -70,7 +79,7 @@ public class Query {
 	 */
 	public void setArguments(String... passedArguments) {
 		this.ARGUMENTS = passedArguments;
-		this.ARGUMENTS_CHANGED = true;
+		this.CHANGED_ARGUMENTS = true;
 	}
 
 	/**
@@ -80,7 +89,7 @@ public class Query {
 	 */
 	public void setOptions(Query... passedOptions) {
 		this.OPTIONS = Collections.unmodifiableList(Arrays.asList(passedOptions));
-		this.OPTIONS_CHANGED = true;
+		this.CHANGED_OPTIONS = true;
 	}
 
 	/**
@@ -89,14 +98,14 @@ public class Query {
 	 * @return This {@link Query}, in finalized {@code String} form.
 	 */
 	public String build() {
-		boolean requiresRebuild = (this.RESULTS_CHANGED || this.ARGUMENTS_CHANGED || this.OPTIONS_CHANGED);
+		boolean requiresRebuild = (this.CHANGED_RESULTS || this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS);
 		if (requiresRebuild) {
-			this.CACHE_FINALIZED = this.buildCommand();
+			this.CACHE_FINAL = this.buildCommand();
 			if (this.hasOptions()) {
-				this.CACHE_FINALIZED = concatenateOptions(this.CACHE_FINALIZED, this.buildOptions());
+				this.CACHE_FINAL = concatenateOptions(this.CACHE_FINAL, this.buildOptions());
 			}
 		}
-		return this.CACHE_FINALIZED;
+		return this.CACHE_FINAL;
 	}
 
 	/**
@@ -167,33 +176,33 @@ public class Query {
 	/* Protected methods */
 	
 	protected void setCacheFinalized(String passedString) {
-		this.CACHE_FINALIZED = passedString;
+		this.CACHE_FINAL = passedString;
 	}
 	
 	protected void setCacheArguments(String passedString) {
 		this.CACHE_ARGUMENTS = passedString;
-		this.ARGUMENTS_CHANGED = false;
+		this.CHANGED_ARGUMENTS = false;
 	}
 	
 	protected void setCacheCommand(String passedString) {
 		this.CACHE_COMMAND = passedString;
-		this.ARGUMENTS_CHANGED = false;
+		this.CHANGED_ARGUMENTS = false;
 	}
 	
 	protected void setCacheOptions(String passedString) {
 		this.CACHE_OPTIONS = passedString;
-		this.OPTIONS_CHANGED = false;
+		this.CHANGED_OPTIONS = false;
 	}
 	
 	private void setCacheResults(String[] passedStrings) {
 		this.CACHE_RESULT = Arrays.copyOf(passedStrings, passedStrings.length);
-		this.RESULTS_CHANGED = false;
+		this.CHANGED_RESULTS = false;
 	}
 
 	/* Local Methods */
 
 	private String buildCommand() {
-		if (this.ARGUMENTS_CHANGED) {
+		if (this.CHANGED_ARGUMENTS) {
 			if (this.hasArguments()) {
 				this.CACHE_COMMAND = StringUtilities.getQueryTerm(this.SYNTAX_COMMAND, this.buildArguments());
 			}
@@ -201,12 +210,12 @@ public class Query {
 				this.CACHE_COMMAND = this.SYNTAX_COMMAND;
 			}
 		}
-		this.ARGUMENTS_CHANGED = false;
+		this.CHANGED_ARGUMENTS = false;
 		return this.CACHE_COMMAND;
 	}
 
 	private String buildArguments() {
-		if (this.ARGUMENTS_CHANGED) {
+		if (this.CHANGED_ARGUMENTS) {
 			if (this.hasArguments()) {
 				if (this.ARGUMENTS.length > 0) {
 					this.CACHE_ARGUMENTS = concatenateArguments(this.ARGUMENTS);
@@ -219,24 +228,24 @@ public class Query {
 				this.CACHE_ARGUMENTS = "";
 			}
 		}
-		this.ARGUMENTS_CHANGED = false;
+		this.CHANGED_ARGUMENTS = false;
 		return this.CACHE_ARGUMENTS;
 	}
 
 	private String[] buildResults() {
-		if ((this.RESULTS_CHANGED) || (this.OPTIONS_CHANGED)) {
+		if ((this.CHANGED_RESULTS) || (this.CHANGED_OPTIONS)) {
 			this.CACHE_RESULT = new String[1];
 			this.CACHE_RESULT[0] = this.getResult();
 			for (Query iteratedQuery : this.getOptions()) {
 				this.CACHE_RESULT = joinArrays(this.CACHE_RESULT, iteratedQuery.getResultKeys());
 			}
 		}
-		this.RESULTS_CHANGED = false;
+		this.CHANGED_RESULTS = false;
 		return this.CACHE_RESULT;
 	}
 
 	private String buildOptions() {
-		if (this.OPTIONS_CHANGED) {
+		if (this.CHANGED_OPTIONS) {
 			if (this.hasOptions()) {
 				ArrayList<String> discoveredOptions = new ArrayList<String>();
 				for (Query iteratedQuery : this.getOptions()) {
@@ -247,7 +256,7 @@ public class Query {
 				}
 			}
 		}
-		this.OPTIONS_CHANGED = false;
+		this.CHANGED_OPTIONS = false;
 		return this.CACHE_OPTIONS;
 	}
 
