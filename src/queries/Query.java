@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import utilities.StringUtilities;
 
@@ -17,11 +18,14 @@ import utilities.StringUtilities;
  * @author Malcolm Riley
  */
 public class Query {
+	
+	// Functions
+	private static final Function<Argument, String> ARGUMENT_MAPPER = (Argument argument) -> {return argument.getArgumentSyntax();};
 
 	// Local values
 	private String COMMAND;
 	private String RESULT;
-	private String[] ARGUMENTS;
+	private Argument[] ARGUMENTS;
 	private List<Query> OPTIONS;
 
 	// Cached Results
@@ -29,7 +33,6 @@ public class Query {
 	private String CACHE_COMMAND = null;
 	private String CACHE_ARGUMENTS = null;
 	private String CACHE_OPTIONS = null;
-	private String[] CACHE_RESULT;
 
 	// Change tracking
 	private boolean CHANGED_RESULTS = true;
@@ -60,7 +63,7 @@ public class Query {
 	 * 
 	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
-	public Query(String passedCommandSyntax, String passedResultSyntax, String[] passedArguments) {
+	public Query(String passedCommandSyntax, String passedResultSyntax, Argument[] passedArguments) {
 		this(passedCommandSyntax, passedResultSyntax, passedArguments, (Query[])null);
 	}
 
@@ -74,7 +77,7 @@ public class Query {
 	 * 
 	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
-	public Query(String passedCommandSyntax, String passedResultSyntax, String[] passedArguments, Query... passedOptions) {
+	public Query(String passedCommandSyntax, String passedResultSyntax, Argument[] passedArguments, Query... passedOptions) {
 		if (validateString(passedCommandSyntax) || validateString(passedResultSyntax)) {
 			throw new IllegalArgumentException(EXCEPTION_ILLEGAL_ARGUMENT);
 		}
@@ -91,7 +94,7 @@ public class Query {
 	 * Removes all arguments from this {@link Query}.
 	 */
 	public void resetArguments() {
-		this.setArguments((String[])null);
+		this.setArguments((Argument[])null);
 	}
 	
 	/**
@@ -106,7 +109,7 @@ public class Query {
 	 * 
 	 * @param passedArguments - The new arguments to use for this {@link Query}.
 	 */
-	public void setArguments(String... passedArguments) {
+	public void setArguments(Argument ... passedArguments) {
 		this.ARGUMENTS = passedArguments;
 		this.CHANGED_ARGUMENTS = true;
 	}
@@ -135,15 +138,6 @@ public class Query {
 			}
 		}
 		return this.CACHE_FINAL;
-	}
-
-	/**
-	 * Returns the array of all expected result keys - that is, the result fields in the returned json - for this {@link Query} and all its child option {@link Query}s.
-	 * 
-	 * @return An array of all expected result keys.
-	 */
-	public String[] getResultKeys() {
-		return this.buildResults();
 	}
 
 	/**
@@ -197,7 +191,6 @@ public class Query {
 		newQuery.setCacheArguments(this.buildArguments());
 		newQuery.setCacheCommand(this.buildCommand());
 		newQuery.setCacheOptions(this.buildOptions());
-		newQuery.setCacheResults(this.buildResults());
 		newQuery.setCacheFinalized(this.build());
 		return newQuery;
 	}
@@ -222,11 +215,6 @@ public class Query {
 		this.CACHE_OPTIONS = passedString;
 		this.CHANGED_OPTIONS = false;
 	}
-	
-	private void setCacheResults(String[] passedStrings) {
-		this.CACHE_RESULT = Arrays.copyOf(passedStrings, passedStrings.length);
-		this.CHANGED_RESULTS = false;
-	}
 
 	/* Local Methods */
 
@@ -250,27 +238,12 @@ public class Query {
 					this.CACHE_ARGUMENTS = concatenateArguments(this.ARGUMENTS);
 				}
 				else {
-					this.CACHE_ARGUMENTS = this.ARGUMENTS[0];
+					this.CACHE_ARGUMENTS = this.ARGUMENTS[0].getArgumentSyntax();
 				}
-			}
-			else {
-				this.CACHE_ARGUMENTS = "";
 			}
 		}
 		this.CHANGED_ARGUMENTS = false;
 		return this.CACHE_ARGUMENTS;
-	}
-
-	private String[] buildResults() {
-		if ((this.CHANGED_RESULTS) || (this.CHANGED_OPTIONS)) {
-			this.CACHE_RESULT = new String[1];
-			this.CACHE_RESULT[0] = this.getResult();
-			for (Query iteratedQuery : this.getOptions()) {
-				this.CACHE_RESULT = joinArrays(this.CACHE_RESULT, iteratedQuery.getResultKeys());
-			}
-		}
-		this.CHANGED_RESULTS = false;
-		return this.CACHE_RESULT;
 	}
 
 	private String buildOptions() {
@@ -304,9 +277,17 @@ public class Query {
 	private static String concatenateArguments(String... passedStrings) {
 		return StringUtilities.concatenateStrings("|", passedStrings);
 	}
+	
+	private static String concatenateArguments(Argument ... passedArguments) {
+		return concatenateArguments(buildArgumentArray(passedArguments));
+	}
 
 	private static String concatenateOptions(String... passedStrings) {
 		return StringUtilities.concatenateStrings("&", passedStrings);
+	}
+	
+	private static String[] buildArgumentArray(Argument ... passedArguments) {
+		return (String[]) Arrays.stream(passedArguments).map(ARGUMENT_MAPPER).toArray();
 	}
 
 }
