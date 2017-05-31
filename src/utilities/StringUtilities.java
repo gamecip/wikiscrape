@@ -29,7 +29,6 @@ public class StringUtilities {
 	 * This method does not check whether the passed query parameter String is a valid query,
 	 * neither does it check whether the passed query arguments exceed the configured max
 	 * query threshold in quantity. Such checking should be performed elsewhere.
-	 * <p>
 	 *
 	 * @param passedQueryParameter - The Wiki-defined query parameter to be used
 	 * @param passedQueryArguments - The arguments to be passed to the aforementioned query
@@ -43,7 +42,8 @@ public class StringUtilities {
 	/**
 	 * Returns a single String-form query term using the passed query parameter String and the single
 	 * passed argument String.
-	 * Format of the returned String will be {@code "queryParameter=queryArgument}
+	 * <p>
+	 * Format of the returned String will be {@code "queryParameter=queryArgument"}.
 	 *
 	 * @param passedQueryParameter - The Wiki-defined query parameter to be used
 	 * @param passedQueryArgument - The argument to be passed to the aforementioned query
