@@ -35,7 +35,7 @@ public class StringUtilities {
 	 * @return A properly formatted API query term.
 	 */
 	public static String getQueryTerm(String passedQueryParameter, String... passedQueryArguments) {
-		String queryParameters = StringUtilities.concatenateStrings("|", passedQueryArguments);
+		String queryParameters = concatenateArguments(passedQueryArguments);
 		return StringUtilities.getQueryTerm(passedQueryParameter, queryParameters);
 	}
 
@@ -52,5 +52,25 @@ public class StringUtilities {
 	public static String getQueryTerm(String passedQueryParameter, String passedQueryArgument) {
 		return String.format("%s=%s", passedQueryParameter, passedQueryArgument);
 	}
-
+	
+	/**
+	 * Convenience Method concatenates the passed Strings with a pipe character "|" sandwiched between them.
+	 * 
+	 * @param passedArgumentStrings - The Strings to concatenate
+	 * @return A suitably formatted String.
+	 */
+	public static String concatenateArguments(String ... passedArgumentStrings) {
+		return concatenateStrings("|", passedArgumentStrings);
+	}
+	
+	/**
+	 * Convenience Method concatenates the passed Strings with an ampersand character "&" sandwiched between them.
+	 * 
+	 * @param passedArgumentStrings - The Strings to concatenate
+	 * @return A suitably formatted String.
+	 */
+	public static String concatenateCommands(String ... passedCommandStrings) {
+		return concatenateStrings("&", passedCommandStrings);
+	}
+ 
 }

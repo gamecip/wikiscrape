@@ -1,5 +1,8 @@
 package queries;
 
+import utilities.StringUtilities;
+import wikiscrape.ScraperConfig;
+
 /**
  * Defines a list of known Wiki query API calls.
  *
@@ -9,6 +12,32 @@ public class QueryFactory {
 
 	private QueryFactory() {
 	};
+	
+	private static final String ACTION = "action";
+	private static final String QUERY = "query";
+	
+	public static enum PageSpecification {
+
+		BY_IDS("pageids"),
+		BY_TITLES("titles"),
+		BY_REVISION_IDS("revids"),;
+
+		private String TYPE;
+
+		private PageSpecification(String passedArgument) {
+			this.TYPE = passedArgument;
+		}
+
+		public String getType() {
+			return this.TYPE;
+		}
+	}
+	
+	public static String getBaseQuery(PageSpecification passedPageSpecification, String ... passedPageStrings) {
+		String baseURL = String.format("%s%s", ScraperConfig.WIKI_URL, StringUtilities.getQueryTerm(ACTION, QUERY));
+		String pageSpecification = StringUtilities.getQueryTerm(passedPageSpecification.getType(), passedPageStrings);
+		return StringUtilities.concatenateCommands(baseURL, pageSpecification);
+	}
 
 //	/* Revision metadata queries */
 //	public static final QueryCommand OPTION_REVISIONS_IDS = new QueryCommand("ids", "revids");
@@ -23,24 +52,5 @@ public class QueryFactory {
 //	public static final QueryCommand ARGUMENT_SECTIONFORMAT = new QueryCommand("exsectionformat", "extract", OPTION_EXTRACTS_PLAIN, OPTION_EXTRACTS_WIKI, OPTION_EXTRACTS_RAW);
 //	public static final QueryCommand ARGUMENT_PLAINTEXT = new QueryCommand("explaintext", "extract");
 //
-//	public static final String TYPE_ACTION = "action";
-//	public static final String TYPE_QUERY = "query";
 //	public static final String TYPE_PROPERTIES = "prop";
-//
-//	public static enum PageSpecification {
-//
-//		BY_IDS("pageids"),
-//		BY_TITLES("titles"),
-//		BY_REVISION_IDS("revids"),;
-//
-//		private String ARGUMENT;
-//
-//		private PageSpecification(String passedArgument) {
-//			this.ARGUMENT = passedArgument;
-//		}
-//
-//		public String getArgument() {
-//			return this.ARGUMENT;
-//		}
-//	}
 }
