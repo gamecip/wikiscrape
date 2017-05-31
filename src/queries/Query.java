@@ -35,12 +35,17 @@ public class Query {
 	private boolean CHANGED_RESULTS = true;
 	private boolean CHANGED_ARGUMENTS = true;
 	private boolean CHANGED_OPTIONS = true;
+	
+	// Strings
+	private static final String EXCEPTION_ILLEGAL_ARGUMENT = "String argument may not be empty or null.";
 
 	/**
 	 * Constructs a new {@link Query} without arguments or options, with the passed command and result syntaxes.
 	 * 
 	 * @param passedCommandSyntax - The syntax of the command to be used
 	 * @param passedResultSyntax - The expected result field given a successful query
+	 * 
+	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
 	public Query(String passedCommandSyntax, String passedResultSyntax) {
 		this(passedCommandSyntax, passedResultSyntax, null, (Query[])null);
@@ -52,6 +57,8 @@ public class Query {
 	 * @param passedCommandSyntax - The syntax of the command to be used
 	 * @param passedResultSyntax - The expected result field given a successful query
 	 * @param passedArguments - The arguments to be used for this command
+	 * 
+	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
 	public Query(String passedCommandSyntax, String passedResultSyntax, String[] passedArguments) {
 		this(passedCommandSyntax, passedResultSyntax, passedArguments, (Query[])null);
@@ -64,8 +71,13 @@ public class Query {
 	 * @param passedResultSyntax - The expected result field given a successful query
 	 * @param passedArguments - The arguments to be used for this command
 	 * @param passedOptions - The attached {@link Query}s to be used as options.
+	 * 
+	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
 	public Query(String passedCommandSyntax, String passedResultSyntax, String[] passedArguments, Query... passedOptions) {
+		if (validateString(passedCommandSyntax) || validateString(passedResultSyntax)) {
+			throw new IllegalArgumentException(EXCEPTION_ILLEGAL_ARGUMENT);
+		}
 		this.COMMAND = passedCommandSyntax;
 		this.RESULT = passedResultSyntax;
 		this.setArguments(passedArguments);
@@ -278,6 +290,10 @@ public class Query {
 	}
 
 	/* Logic Methods */
+	
+	private static boolean validateString(String passedString) {
+		return (passedString != null) && (!passedString.isEmpty());
+	}
 
 	private static <Type> Type[] joinArrays(Type[] passedFirstArray, Type[] passedSecondArray) {
 		Type[] joinedArray = Arrays.copyOf(passedFirstArray, passedFirstArray.length + passedSecondArray.length);
