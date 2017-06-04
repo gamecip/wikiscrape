@@ -39,10 +39,19 @@ public class Query {
 	private boolean CHANGED_OPTIONS = true;
 	
 	// Strings
-	private static final String EXCEPTION_ILLEGAL_ARGUMENT = "String argument may not be empty or null.";
+	private static final String EXCEPTION_ILLEGAL_ARGUMENT = "Argument may not be null, neither may it have empty or null syntax or results.";
+	
+	/**
+	 * Constructs a new {@link Query} without child arguments or options, with the passed {@link Argument} representing its command and result syntaxes.
+	 * 
+	 * @param passedCommand - An {@link Argument} representing the syntax to be used for this {@link Query}'s command and results
+	 */
+	public Query(Argument passedArgument) {
+		this(passedArgument, null, (Query[])null);
+	}
 
 	/**
-	 * Constructs a new {@link Query} without arguments or options, with the passed command and result syntaxes.
+	 * Constructs a new {@link Query} without arguments or options, with the passed {@link Argument} representing its command and result syntaxes.
 	 * 
 	 * @param passedCommandSyntax - The syntax of the command to be used
 	 * @param passedResultSyntax - The expected result field given a successful query
@@ -50,37 +59,35 @@ public class Query {
 	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
 	public Query(String passedCommandSyntax, String passedResultSyntax) {
-		this(passedCommandSyntax, passedResultSyntax, null, (Query[])null);
+		this(new Argument(passedCommandSyntax, passedResultSyntax), null, (Query[])null);
 	}
 	
 	/**
 	 * Constructs a new {@link Query} with the passed arguments and no options.
 	 * 
-	 * @param passedCommandSyntax - The syntax of the command to be used
-	 * @param passedResultSyntax - The expected result field given a successful query
+	 * @param passedCommand - An {@link Argument} representing the syntax to be used for this {@link Query}'s command and results
 	 * @param passedArguments - The arguments to be used for this command
 	 * 
 	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
-	public Query(String passedCommandSyntax, String passedResultSyntax, Argument[] passedArguments) {
-		this(passedCommandSyntax, passedResultSyntax, passedArguments, (Query[])null);
+	public Query(Argument passedArgument, Argument[] passedArguments) {
+		this(passedArgument, passedArguments, (Query[])null);
 	}
 
 	/**
 	 * Constructs a new {@link Query} with the passed arguments and options.
 	 * 
-	 * @param passedCommandSyntax - The syntax of the command to be used
-	 * @param passedResultSyntax - The expected result field given a successful query
+	 * @param passedCommand - An {@link Argument} representing the syntax to be used for this {@link Query}'s command and results
 	 * @param passedArguments - The arguments to be used for this command
 	 * @param passedOptions - The attached {@link Query}s to be used as options.
 	 * 
 	 * @throws IllegalArgumentException - If passedCommandSyntax or passedResultSyntax are empty or null.
 	 */
-	public Query(String passedCommandSyntax, String passedResultSyntax, Argument[] passedArguments, Query... passedOptions) {
-		if (validateString(passedCommandSyntax) || validateString(passedResultSyntax)) {
+	public Query(Argument passedCommand, Argument[] passedArguments, Query... passedOptions) {
+		if (validateArgument(passedCommand)) {
 			throw new IllegalArgumentException(EXCEPTION_ILLEGAL_ARGUMENT);
 		}
-		this.COMMAND = new Argument(passedCommandSyntax, passedResultSyntax);
+		this.COMMAND = passedCommand;
 		this.setArguments(passedArguments);
 		this.setOptions(passedOptions);
 		this.CHANGED_RESULTS = true;
@@ -106,20 +113,24 @@ public class Query {
 	 * Sets the arguments of this {@link Query} to the passed arguments.
 	 * 
 	 * @param passedArguments - The new arguments to use for this {@link Query}.
+	 * @return {@code this}, for the purpose of method chaining.
 	 */
-	public void setArguments(Argument ... passedArguments) {
+	public Query setArguments(Argument ... passedArguments) {
 		this.ARGUMENTS = passedArguments;
 		this.CHANGED_ARGUMENTS = true;
+		return this;
 	}
 
 	/**
 	 * Sets the options of this {@link Query} to the passed {@link Query}s.
 	 * 
 	 * @param passedOptions - the {@link Query}s to set as the options for this {@link Query} intance.
+	 * @return {@code this}, for the purpose of method chaining.
 	 */
-	public void setOptions(Query... passedOptions) {
+	public Query setOptions(Query... passedOptions) {
 		this.OPTIONS = Collections.unmodifiableList(Arrays.asList(passedOptions));
 		this.CHANGED_OPTIONS = true;
+		return this;
 	}
 
 	/**
@@ -185,7 +196,7 @@ public class Query {
 	
 	@Override
 	public Query clone() {
-		Query newQuery = new Query(this.COMMAND.getArgumentSyntax(), this.COMMAND.getResultSyntax(), this.ARGUMENTS, this.OPTIONS.toArray(new Query[]{}));
+		Query newQuery = new Query(this.COMMAND, this.ARGUMENTS, this.OPTIONS.toArray(new Query[]{}));
 		newQuery.setCacheArguments(this.buildArguments());
 		newQuery.setCacheCommand(this.buildCommand());
 		newQuery.setCacheOptions(this.buildOptions());
@@ -261,6 +272,13 @@ public class Query {
 	}
 
 	/* Logic Methods */
+	
+	private static boolean validateArgument(Argument passedArgument) {
+		if (passedArgument == null) {
+			return false;
+		}
+		return validateString(passedArgument.getArgumentSyntax()) && validateString(passedArgument.getResultSyntax());
+	}
 	
 	private static boolean validateString(String passedString) {
 		return (passedString != null) && (!passedString.isEmpty());
