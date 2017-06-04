@@ -6,6 +6,23 @@ public class Argument {
 	private String SYNTAX_ARGUMENT;
 	private String SYNTAX_RESULT;
 	
+	/**
+	 * Creates a new {@link Argument} using the passed {@code String} as its syntax.
+	 * 
+	 * @param passedArgumentSyntax - The syntax of the new {@link Argument}.
+	 */
+	public Argument(String passedArgumentSyntax) {
+		this.SYNTAX_ARGUMENT = passedArgumentSyntax;
+		this.SYNTAX_RESULT = null;
+	}
+	
+	/**
+	 * Creates a new {@link Argument} using the first passed {@code String} as its syntax, and the
+	 * second passed {@code String} as the syntax of the expected result.
+	 * 
+	 * @param passedArgumentSyntax - The syntax of the new {@link Argument}.
+	 * @param passedArgumentSyntax - The syntax of this {@link Argument}'s result.
+	 */
 	public Argument(String passedArgumentSyntax, String passedResultSyntax) {
 		this.SYNTAX_ARGUMENT = passedArgumentSyntax;
 		this.SYNTAX_RESULT = passedResultSyntax;
