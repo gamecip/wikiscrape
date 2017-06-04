@@ -190,7 +190,6 @@ public class Query {
 		newQuery.setCacheCommand(this.buildCommand());
 		newQuery.setCacheOptions(this.buildOptions());
 		newQuery.setCacheFinalized(this.build());
-		newQuery.resetFlags();
 		return newQuery;
 	}
 	
@@ -213,12 +212,6 @@ public class Query {
 	protected void setCacheOptions(String passedString) {
 		this.CACHE_OPTIONS = passedString;
 		this.CHANGED_OPTIONS = false;
-	}
-	
-	protected void resetFlags() {
-		this.CHANGED_ARGUMENTS = false;
-		this.CHANGED_OPTIONS = false;
-		this.CHANGED_RESULTS = false;
 	}
 
 	/* Local Methods */
