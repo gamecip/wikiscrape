@@ -23,8 +23,7 @@ public class Query {
 	private static final Function<Argument, String> ARGUMENT_MAPPER = (Argument argument) -> {return argument.getArgumentSyntax();};
 
 	// Local values
-	private String COMMAND;
-	private String RESULT;
+	private Argument COMMAND;
 	private Argument[] ARGUMENTS;
 	private List<Query> OPTIONS;
 
@@ -81,8 +80,7 @@ public class Query {
 		if (validateString(passedCommandSyntax) || validateString(passedResultSyntax)) {
 			throw new IllegalArgumentException(EXCEPTION_ILLEGAL_ARGUMENT);
 		}
-		this.COMMAND = passedCommandSyntax;
-		this.RESULT = passedResultSyntax;
+		this.COMMAND = new Argument(passedCommandSyntax, passedResultSyntax);
 		this.setArguments(passedArguments);
 		this.setOptions(passedOptions);
 		this.CHANGED_RESULTS = true;
@@ -154,7 +152,7 @@ public class Query {
 	 * @return The syntax of this command.
 	 */
 	public String getCommand() {
-		return this.COMMAND;
+		return this.COMMAND.getArgumentSyntax();
 	}
 
 	/**
@@ -164,7 +162,7 @@ public class Query {
 	 * @return The result key for this {@link Query}.
 	 */
 	public String getResult() {
-		return this.RESULT;
+		return this.COMMAND.getResultSyntax();
 	}
 
 	/**
@@ -187,11 +185,12 @@ public class Query {
 	
 	@Override
 	public Query clone() {
-		Query newQuery = new Query(this.COMMAND, this.RESULT, this.ARGUMENTS, this.OPTIONS.toArray(new Query[]{}));
+		Query newQuery = new Query(this.COMMAND.getArgumentSyntax(), this.COMMAND.getResultSyntax(), this.ARGUMENTS, this.OPTIONS.toArray(new Query[]{}));
 		newQuery.setCacheArguments(this.buildArguments());
 		newQuery.setCacheCommand(this.buildCommand());
 		newQuery.setCacheOptions(this.buildOptions());
 		newQuery.setCacheFinalized(this.build());
+		newQuery.resetFlags();
 		return newQuery;
 	}
 	
@@ -215,16 +214,22 @@ public class Query {
 		this.CACHE_OPTIONS = passedString;
 		this.CHANGED_OPTIONS = false;
 	}
+	
+	protected void resetFlags() {
+		this.CHANGED_ARGUMENTS = false;
+		this.CHANGED_OPTIONS = false;
+		this.CHANGED_RESULTS = false;
+	}
 
 	/* Local Methods */
 
 	private String buildCommand() {
 		if (this.CHANGED_ARGUMENTS) {
 			if (this.hasArguments()) {
-				this.CACHE_COMMAND = Utilities.getQueryTerm(this.COMMAND, this.buildArguments());
+				this.CACHE_COMMAND = Utilities.getQueryTerm(this.COMMAND.getArgumentSyntax(), this.buildArguments());
 			}
 			else {
-				this.CACHE_COMMAND = this.COMMAND;
+				this.CACHE_COMMAND = this.COMMAND.getArgumentSyntax();
 			}
 		}
 		this.CHANGED_ARGUMENTS = false;
