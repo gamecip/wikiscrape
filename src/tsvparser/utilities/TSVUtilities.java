@@ -39,7 +39,7 @@ public class TSVUtilities {
 	 * Returns whether the {@link File} at the passed {@link Path} has the passed {@code String} extension.
 	 * 
 	 * @param passedPath - The {@link Path} at which to look for a {@link File}
-	 * @param passedExtension - The file exension to check against
+	 * @param passedExtension - The file extension to check against
 	 * @return Whether the {@link File} at the passed {@link Path} has the passed extension, or {@code false} if no such file exists.
 	 */
 	public static boolean checkExtension(Path passedPath, String passedExtension) {
