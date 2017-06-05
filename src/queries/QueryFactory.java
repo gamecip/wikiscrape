@@ -19,7 +19,7 @@ public class QueryFactory {
 	private static final String EXTRACT = "extract";
 	private static final String PROPERTIES = "prop";
 	
-	// Arguments
+	// Known Arguments
 	public static final Argument REVISION_IDS = new Argument("ids", "revids");
 	public static final Argument REVISION_FLAGS = new Argument("flags", "minor");
 	public static final Argument REVISION_SIZE = new Argument("size", "size");
