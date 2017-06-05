@@ -1,4 +1,4 @@
-package utilities;
+package wikiscrape.utilities;
 
 import java.util.Arrays;
 

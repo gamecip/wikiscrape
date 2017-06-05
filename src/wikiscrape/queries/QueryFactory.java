@@ -1,7 +1,7 @@
-package queries;
+package wikiscrape.queries;
 
-import utilities.Utilities;
 import wikiscrape.ScraperConfig;
+import wikiscrape.utilities.Utilities;
 
 /**
  * Defines a list of known Wiki query API calls.

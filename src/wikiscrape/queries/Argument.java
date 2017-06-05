@@ -1,4 +1,4 @@
-package queries;
+package wikiscrape.queries;
 
 public class Argument {
 	

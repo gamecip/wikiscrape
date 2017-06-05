@@ -1,4 +1,4 @@
-package queries;
+package wikiscrape.queries;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import utilities.Utilities;
+import wikiscrape.utilities.Utilities;
 
 /**
  * Flexible class for defining a wiki api query.
