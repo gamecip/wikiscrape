@@ -18,7 +18,7 @@ public class TSVUtilities {
 	/**
 	 * Builds a {@link List} containing {@link Path} objects of all files in the passed directory with the passed extension.
 	 * <p>
-	 * {@link Stream#empty()} will be returned if no such file exists, or if an {@link IOException} occurs.
+	 * An empty {@link List} will be returned if no such file exists, or if an {@link IOException} occurs.
 	 * 
 	 * @param passedFilePath - The {@link Path} to look for files in
 	 * @param passedFileExtension - The extension to get files for
