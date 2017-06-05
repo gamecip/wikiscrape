@@ -75,7 +75,7 @@ public class TSVUtilities {
 	/**
 	 * Returns a single {@link TableEntry} object from the passed {@code String} line.
 	 * <p>
-	 * Internally, the method calls {@link String#split("\t")} and builds a TableEntry from the
+	 * Internally, the method calls {@link String#split()} and builds a {@link TableEntry} from the
 	 * results. No checking for validity of data is performed at this stage.
 	 * @param passedString - The {@code String} to split
 	 * @return A suitably instantiated {@link TableEntry}.
