@@ -44,7 +44,7 @@ public class TSVUtilities {
 	public static Stream<Path> getFilesInDirectory(String passedFilePath, String passedFileExtension) {
 		FileVisitOption options = FileVisitOption.FOLLOW_LINKS;
 		try (Stream<Path> discoveredPaths = Files.walk(Paths.get(passedFilePath), options)) {
-			return discoveredPaths.filter(Files::isRegularFile).filter((Path passedPath) -> { return (Files.isReadable(passedPath) && TSVUtilities.checkExtension(passedPath, passedFileExtension)); });
+			return discoveredPaths.filter(Files::isRegularFile).filter(passedPath -> { return (Files.isReadable(passedPath) && TSVUtilities.checkExtension(passedPath, passedFileExtension)); });
 		}
 		catch (IOException passedException) {
 			passedException.printStackTrace();
