@@ -24,13 +24,15 @@ public class QueryFactory {
 	public static final Argument REVISION_FLAGS = new Argument("flags", "minor");
 	public static final Argument REVISION_SIZE = new Argument("size", "size");
 	
-	public static final Argument EXTRACTS_PLAIN = new Argument("plain", EXTRACT);
-	public static final Argument EXTRACTS_WIKI = new Argument("wiki", EXTRACT);
-	public static final Argument EXTRACTS_RAW = new Argument("raw", EXTRACT);
+	public static final Argument OPTION_EXTRACTS_PLAIN = new Argument("plain", EXTRACT);
+	public static final Argument OPTION_EXTRACTS_WIKI = new Argument("wiki", EXTRACT);
+	public static final Argument OPTION_EXTRACTS_RAW = new Argument("raw", EXTRACT);
+	
+	public static final Argument REVISIONS = new Argument("revisions", "revisions");
 	
 	// Known Queries
 	public static final Query GET_PLAINTEXT = new Query("explaintext", EXTRACT);
-	public static final Query GET_REVISIONS = new Query("rvprop", "revisions");
+	public static final Query GET_PROPERTIES = new Query(new Argument(PROPERTIES));
 	
 	// Specifying Pages
 	public static enum PageSpecification {
