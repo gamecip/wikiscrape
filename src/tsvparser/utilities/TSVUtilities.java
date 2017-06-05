@@ -16,23 +16,23 @@ public class TSVUtilities {
 	private TSVUtilities(){};
 	
 	/**
-	 * Returns a {@link Stream} containing {@link Path} objects of all files in the passed directory with the passed extension.
+	 * Builds a {@link List} containing {@link Path} objects of all files in the passed directory with the passed extension.
 	 * <p>
 	 * {@link Stream#empty()} will be returned if no such file exists, or if an {@link IOException} occurs.
 	 * 
 	 * @param passedFilePath - The {@link Path} to look for files in
 	 * @param passedFileExtension - The extension to get files for
-	 * @return A {@link Stream} of {@link Path} objects corresponding to any such files
+	 * @return A {@link List} of {@link Path} objects corresponding to any such files
 	 */
-	public static Stream<Path> getFilesInDirectory(String passedFilePath, String passedFileExtension) {
-		FileVisitOption options = FileVisitOption.FOLLOW_LINKS;
-		try (Stream<Path> discoveredPaths = Files.walk(Paths.get(passedFilePath), options)) {
-			return discoveredPaths.filter(Files::isRegularFile).filter(passedPath -> { return (Files.isReadable(passedPath) && TSVUtilities.checkExtension(passedPath, passedFileExtension)); });
+	public static List<Path> getFilesInDirectory(String passedFilePath, String passedFileExtension) {
+		ArrayList<Path> paths = new ArrayList<Path>();
+		try (Stream<Path> discoveredPaths = Files.walk(Paths.get(passedFilePath), FileVisitOption.FOLLOW_LINKS)) {
+			discoveredPaths.forEach(path -> { if (validatePath(path) && checkExtension(path, passedFileExtension)) paths.add(path); } );
 		}
 		catch (IOException passedException) {
 			passedException.printStackTrace();
 		}
-		return Stream.empty();
+		return paths;
 	}
 	
 	/**
@@ -82,6 +82,12 @@ public class TSVUtilities {
 	 */
 	public static TableEntry fromLine(String passedString) {
 		return new TableEntry(passedString.split("\t"));
+	}
+	
+	// Logic Methods 
+	
+	private static boolean validatePath(Path passedPath) {
+		return Files.isReadable(passedPath) && Files.isRegularFile(passedPath);
 	}
 
 }
