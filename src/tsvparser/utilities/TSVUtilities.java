@@ -1,11 +1,14 @@
 package tsvparser.utilities;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class TSVUtilities {
@@ -50,9 +53,35 @@ public class TSVUtilities {
 		}
 	}
 	
+	/**
+	 * Builds a {@link List} of {@link TableEntry} objects from a .tsv file at the {@link Path}.
+	 * 
+	 * @param passedFilePath - The path at which the .tsv file resides
+	 * @return A list of {@link TableEntry} objects constructed from the .tsv file at the passed path, or an empty list if no such file exists.
+	 */
+	public static List<TableEntry> buildEntries(Path passedFilePath) {
+		ArrayList<TableEntry> entries = new ArrayList<TableEntry>();
+		try (BufferedReader reader = Files.newBufferedReader(passedFilePath)) {
+			Stream<String> lines = reader.lines();
+			// Skip header row - contains labels that are not needed
+			lines.skip(1).forEach(string -> entries.add(TSVUtilities.fromLine(string)));
+		}
+		catch (IOException passedException) {
+			passedException.printStackTrace();
+		}
+		return entries;
+	}
+	
+	/**
+	 * Returns a single {@link TableEntry} object from the passed {@code String} line.
+	 * <p>
+	 * Internally, the method calls {@link String#split("\t")} and builds a TableEntry from the
+	 * results. No checking for validity of data is performed at this stage.
+	 * @param passedString - The {@code String} to split
+	 * @return A suitably instantiated {@link TableEntry}.
+	 */
 	public static TableEntry fromLine(String passedString) {
-		String[] entries = passedString.split("\t");
-		return new TableEntry(entries);
+		return new TableEntry(passedString.split("\t"));
 	}
 
 }
