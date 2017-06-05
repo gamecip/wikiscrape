@@ -1,6 +1,6 @@
 package tsvparser.utilities;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -11,26 +11,6 @@ import java.util.stream.Stream;
 public class TSVUtilities {
 	
 	private TSVUtilities(){};
-	
-	/**
-	 * Returns a {@link Stream} containing the contents of the file at the passed {@link Path}.
-	 * <p>
-	 * {@link Stream#empty()} will be returned if no such file exists, or if an {@link IOException} occurs.
-	 * 
-	 * @param passedFilePath - The {@link Path} at which to look for a file
-	 * @return A {@link Stream} of that file's lines.
-	 */
-	public static Stream<String> readFile(Path passedFilePath) {
-		try (BufferedReader reader = Files.newBufferedReader(passedFilePath)) {
-			Stream<String> stream = reader.lines();
-			reader.close();
-			return stream;
-		}
-		catch (IOException passedException) {
-			passedException.printStackTrace();
-		}
-		return Stream.empty();
-	}
 	
 	/**
 	 * Returns a {@link Stream} containing {@link Path} objects of all files in the passed directory with the passed extension.
@@ -68,6 +48,11 @@ public class TSVUtilities {
 		else {
 			return fileName.substring(dotIndex + 1).equals(passedExtension);
 		}
+	}
+	
+	public static TableEntry fromLine(String passedString) {
+		String[] entries = passedString.split("\t");
+		return new TableEntry(entries);
 	}
 
 }
