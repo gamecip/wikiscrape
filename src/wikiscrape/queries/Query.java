@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import wikiscrape.utilities.Utilities;
+import wikiscrape.utilities.ScrapeUtilities;
 
 /**
  * Flexible class for defining a wiki api query.
@@ -230,7 +230,7 @@ public class Query {
 	private String buildCommand() {
 		if (this.CHANGED_ARGUMENTS) {
 			if (this.hasArguments()) {
-				this.CACHE_COMMAND = Utilities.getQueryTerm(this.COMMAND.getArgumentSyntax(), this.buildArguments());
+				this.CACHE_COMMAND = ScrapeUtilities.getQueryTerm(this.COMMAND.getArgumentSyntax(), this.buildArguments());
 			}
 			else {
 				this.CACHE_COMMAND = this.COMMAND.getArgumentSyntax();
@@ -285,7 +285,7 @@ public class Query {
 	}
 
 	private static String concatenateArguments(String... passedStrings) {
-		return Utilities.concatenateStrings("|", passedStrings);
+		return ScrapeUtilities.concatenateStrings("|", passedStrings);
 	}
 	
 	private static String concatenateArguments(Argument ... passedArguments) {
@@ -293,7 +293,7 @@ public class Query {
 	}
 
 	private static String concatenateOptions(String... passedStrings) {
-		return Utilities.concatenateStrings("&", passedStrings);
+		return ScrapeUtilities.concatenateStrings("&", passedStrings);
 	}
 	
 	private static String[] buildArgumentArray(Argument ... passedArguments) {

@@ -1,7 +1,7 @@
 package wikiscrape.queries;
 
 import wikiscrape.ScraperConfig;
-import wikiscrape.utilities.Utilities;
+import wikiscrape.utilities.ScrapeUtilities;
 
 /**
  * Defines a list of known Wiki query API calls.
@@ -53,8 +53,8 @@ public class QueryFactory {
 	}
 	
 	public static String getQueryURL(PageSpecification passedPageSpecification, String ... passedPageStrings) {
-		String baseURL = String.format("%s%s", ScraperConfig.WIKI_URL, Utilities.getQueryTerm(ACTION, QUERY));
-		String pageSpecification = Utilities.getQueryTerm(passedPageSpecification.getType(), passedPageStrings);
-		return Utilities.concatenateCommands(baseURL, pageSpecification);
+		String baseURL = String.format("%s%s", ScraperConfig.WIKI_URL, ScrapeUtilities.getQueryTerm(ACTION, QUERY));
+		String pageSpecification = ScrapeUtilities.getQueryTerm(passedPageSpecification.getType(), passedPageStrings);
+		return ScrapeUtilities.concatenateCommands(baseURL, pageSpecification);
 	}
 }

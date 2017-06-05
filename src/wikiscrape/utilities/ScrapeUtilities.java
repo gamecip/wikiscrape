@@ -2,9 +2,9 @@ package wikiscrape.utilities;
 
 import java.util.Arrays;
 
-public class Utilities {
+public class ScrapeUtilities {
 
-	private Utilities() {
+	private ScrapeUtilities() {
 	};
 
 	/**
@@ -38,7 +38,7 @@ public class Utilities {
 	 */
 	public static String getQueryTerm(String passedQueryParameter, String... passedQueryArguments) {
 		String queryParameters = concatenateArguments(passedQueryArguments);
-		return Utilities.getQueryTerm(passedQueryParameter, queryParameters);
+		return ScrapeUtilities.getQueryTerm(passedQueryParameter, queryParameters);
 	}
 
 	/**
