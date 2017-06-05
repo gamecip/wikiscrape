@@ -54,22 +54,22 @@ public class TSVUtilities {
 	}
 	
 	/**
-	 * Builds a {@link List} of {@link TableEntry} objects from a .tsv file at the {@link Path}.
-	 * 
+	 * Adds to a passed {@link List} all the {@link TableEntry} objects constructed from a file at the {@link Path}.
+	 * <p>
+	 * Note that no {@link TableEntry} objects will be added to the list if the {@link Path}-indicated file cannot be
+	 * read.
 	 * @param passedFilePath - The path at which the .tsv file resides
-	 * @return A list of {@link TableEntry} objects constructed from the .tsv file at the passed path, or an empty list if no such file exists.
+	 * @param passedList - The {@link List} to add the constructed {@link TableEntry} objects to
 	 */
-	public static List<TableEntry> buildEntries(Path passedFilePath) {
-		ArrayList<TableEntry> entries = new ArrayList<TableEntry>();
+	public static void buildEntries(List<TableEntry> passedList, Path passedFilePath) {
 		try (BufferedReader reader = Files.newBufferedReader(passedFilePath)) {
 			Stream<String> lines = reader.lines();
 			// Skip header row - contains labels that are not needed
-			lines.skip(1).forEach(string -> entries.add(TSVUtilities.fromLine(string)));
+			lines.skip(1).forEach(string -> passedList.add(TSVUtilities.fromLine(string)));
 		}
 		catch (IOException passedException) {
 			passedException.printStackTrace();
 		}
-		return entries;
 	}
 	
 	/**
