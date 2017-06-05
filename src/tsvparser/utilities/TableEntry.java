@@ -7,7 +7,7 @@ package tsvparser.utilities;
  */
 public class TableEntry {
 	
-	private String[] ENTRIES;
+	private final String[] ENTRIES;
 	
 	public TableEntry(String[] passedEntries) {
 		this.ENTRIES = passedEntries;
