@@ -33,7 +33,7 @@ public class Queries {
 	
 	public static final Argument REVISIONS = new Argument(STRING_REVISIONS, STRING_REVISIONS);
 	
-	// Known Queries
+	// Known "Get" Queries
 	public static final QueryBuilder GET_PLAINTEXT = new QueryBuilder("explaintext", STRING_EXTRACT);
 	public static final QueryBuilder GET_PROPERTIES = new QueryBuilder(new Argument(STRING_PROPERTIES));
 	
