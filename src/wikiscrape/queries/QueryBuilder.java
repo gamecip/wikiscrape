@@ -12,7 +12,8 @@ import wikiscrape.utilities.ScrapeUtilities;
 /**
  * Flexible class for defining a wiki api query. It is also recursive; it supports adding other {@link QueryBuilder} objects as options.
  * <p>
- * Various levels of caching are used to avoid rebuilding Strings when mutable aspects are changed, i.e. the arguments of the command or the options passed to it.
+ * The primary feature of the QueryBuilder is the fact that it caches {@code String} concatenation results. 
+ * Various levels of caching are used to avoid re-concatenating Strings when mutable aspects are changed, i.e. the arguments of the command or the options passed to it.
  * <p>
  * Calling {@link #build()} will return a {@code String} representation of the desired query.
  * @author Malcolm Riley
