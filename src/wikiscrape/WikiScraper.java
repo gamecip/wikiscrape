@@ -5,6 +5,9 @@ import wikiscrape.queries.QueryBuilder;
 import wikiscrape.utilities.RequestManager;
 
 public class WikiScraper {
+	
+	private static final int MAX_QUERY_SIZE = 50;
+	private static final int MAX_PLAINTEXT_EXTRACTS = 20;
 
 	public static void main(String[] passedArguments) {
 		
