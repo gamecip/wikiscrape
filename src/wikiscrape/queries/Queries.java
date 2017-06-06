@@ -14,6 +14,7 @@ public class Queries {
 	private static final String STRING_EXTRACT = "extract";
 	private static final String STRING_PROPERTIES = "prop";
 	private static final String STRING_REVISIONS = "revisions";
+	private static final String STRING_PAGEIDS = "pageids";
 	
 	// Known Actions
 	public static final String QUERY = "action=query";
@@ -21,7 +22,7 @@ public class Queries {
 	// Known Arguments	
 	public static final Argument EXTRACTS = new Argument("extracts");
 	
-	public static final Argument PAGES_BY_ID = new Argument("pageids");
+	public static final Argument PAGES_BY_ID = new Argument(STRING_PAGEIDS);
 	public static final Argument PAGES_BY_TITLE = new Argument("titles");
 	public static final Argument PAGES_BY_REVISION_ID = new Argument("revids");
 	
@@ -32,6 +33,7 @@ public class Queries {
 	public static final Argument OPTION_SECTIONFORMAT_PLAIN = new Argument("plain", STRING_EXTRACT);
 	public static final Argument OPTION_SECTIONFORMAT_WIKI = new Argument("wiki", STRING_EXTRACT);
 	public static final Argument OPTION_SECTIONFORMAT_RAW = new Argument("raw", STRING_EXTRACT);
+	public static final Argument OPTION_INDEX_PAGEIDS = new Argument("indexpageids", STRING_PAGEIDS);
 	
 	public static final Argument REVISIONS = new Argument(STRING_REVISIONS, STRING_REVISIONS);
 	
