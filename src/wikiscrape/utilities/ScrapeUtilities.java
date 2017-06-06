@@ -6,8 +6,6 @@ import java.util.function.Function;
 import wikiscrape.queries.Argument;
 
 public class ScrapeUtilities {
-	
-	private static final Function<String, Argument>ARGUMENT_MAPPER = (String string) -> { return new Argument(string); }; 
 
 	private ScrapeUtilities() {
 	};
