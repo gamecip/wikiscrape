@@ -1,8 +1,13 @@
 package wikiscrape.utilities;
 
 import java.util.Arrays;
+import java.util.function.Function;
+
+import wikiscrape.queries.Argument;
 
 public class ScrapeUtilities {
+	
+	private static final Function<String, Argument>ARGUMENT_MAPPER = (String string) -> { return new Argument(string); }; 
 
 	private ScrapeUtilities() {
 	};
@@ -73,6 +78,41 @@ public class ScrapeUtilities {
 	 */
 	public static String concatenateCommands(String ... passedCommandStrings) {
 		return concatenateStrings("&", passedCommandStrings);
+	}
+	
+	/**
+	 * Creates an array of {@link Arguments} from an array of {@code Strings} representing the array of command syntaxes to use.
+	 * 
+	 * @param passedCommands - The array of command syntaxes to use
+	 * @return An array of suitably instantiated {@link Argument} instances.
+	 */
+	public static Argument[] fromStrings(String ... passedStrings) {
+		Argument[] argumentArray = new Argument[passedStrings.length];
+		for (int iterator = 0; iterator < passedStrings.length; iterator++) {
+			argumentArray[iterator] = new Argument(passedStrings[iterator]);
+		}
+		return argumentArray;
+	}
+	
+	/**
+	 * Creates an array of {@link Arguments} from two arrays of {@code Strings}, the first representing the array of command syntaxes,
+	 * and the second representing the array of result syntaxes.
+	 * <p>
+	 * The passedCommands array must equal or exceed the passedResults array in size.
+	 * @param passedCommands - The array of command syntaxes to use
+	 * @param passedResults - The array of result syntaxes to use
+	 * @return An array of suitably instantiated {@link Argument} instances.
+	 * @throws IllegalArgumentException - If the {@code passedCommands} array is less in length than the {@code passedResults} array.
+	 */
+	public static Argument[] fromStrings(String[] passedCommands, String[] passedResults) {
+		if (passedCommands.length < passedResults.length) {
+			throw new IllegalArgumentException("Commands array must exceed or equal results array in size.");
+		}
+		Argument[] argumentArray = new Argument[passedCommands.length];
+		for (int iterator = 0; iterator < passedCommands.length; iterator++) {
+			argumentArray[iterator] = new Argument(passedCommands[iterator], passedResults[iterator]);
+		}
+		return argumentArray;
 	}
 	
 	/**
