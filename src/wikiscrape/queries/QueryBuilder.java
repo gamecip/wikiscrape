@@ -12,10 +12,15 @@ import wikiscrape.utilities.ScrapeUtilities;
 /**
  * Flexible class for defining a wiki api query. It is also recursive; it supports adding other {@link QueryBuilder} objects as options.
  * <p>
- * The primary feature of the QueryBuilder is the fact that it caches {@code String} concatenation results. 
+ * Calling {@link #build()} will return a {@code String} representation of the desired query.
+ * <p>
+ * The primary feature of the {@link QueryBuilder} is the fact that it caches {@code String} concatenation results. 
  * Various levels of caching are used to avoid re-concatenating Strings when mutable aspects are changed, i.e. the arguments of the command or the options passed to it.
  * <p>
- * Calling {@link #build()} will return a {@code String} representation of the desired query.
+ * A secondary feature of the {@link QueryBuilder} is that it is sensitive to changes performed on any child {@link QueryBuilder} instance; that is, if it detects
+ * a change in any {@link QueryBuilder} linked as an option, it will perform a rebuild. This allows maintaining a reference to options to change them on the fly; this will trigger
+ * the minimum number of rebuilds necessary to bring the parent {@link QueryBuilder} up to date.
+ * 
  * @author Malcolm Riley
  */
 public class QueryBuilder {
