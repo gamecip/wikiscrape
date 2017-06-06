@@ -142,7 +142,7 @@ public class QueryBuilder {
 	/**
 	 * Sets the options of this {@link QueryBuilder} to the passed {@link QueryBuilder}s.
 	 * 
-	 * @param passedOptions - the {@link QueryBuilder}s to set as the options for this {@link QueryBuilder} intance.
+	 * @param passedOptions - the {@link QueryBuilder}s to set as the options for this {@link QueryBuilder} instance.
 	 * @return {@code this}, for the purpose of method chaining.
 	 */
 	public QueryBuilder setOptions(QueryBuilder... passedOptions) {
