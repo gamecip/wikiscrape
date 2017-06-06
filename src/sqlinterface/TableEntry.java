@@ -1,4 +1,4 @@
-package tsvparser.utilities;
+package sqlinterface;
 
 /**
  * Container class representing a single row in the original TSV.

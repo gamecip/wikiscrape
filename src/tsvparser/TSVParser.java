@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import sqlinterface.TableEntry;
 import tsvparser.utilities.TSVUtilities;
-import tsvparser.utilities.TableEntry;
 
 public class TSVParser {
 	

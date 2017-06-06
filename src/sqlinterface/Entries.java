@@ -1,4 +1,4 @@
-package tsvparser.utilities;
+package sqlinterface;
 
 public class Entries {
 	
