@@ -34,7 +34,6 @@ public class QueryBuilder {
 	private String CACHE_OPTIONS = null;
 
 	// Change tracking
-	private boolean CHANGED_RESULTS = true;
 	private boolean CHANGED_ARGUMENTS = true;
 	private boolean CHANGED_OPTIONS = true;
 	
@@ -94,7 +93,6 @@ public class QueryBuilder {
 		if (passedOptions != null) {
 			this.setOptions(passedOptions);
 		}
-		this.CHANGED_RESULTS = true;
 		this.CHANGED_ARGUMENTS = true;
 		this.CHANGED_OPTIONS = true;
 	}
@@ -143,7 +141,7 @@ public class QueryBuilder {
 	 * @return This {@link QueryBuilder}, in finalized {@code String} form.
 	 */
 	public String build() {
-		boolean requiresRebuild = (this.CHANGED_RESULTS || this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS);
+		boolean requiresRebuild = (this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS);
 		if (requiresRebuild) {
 			this.CACHE_FINAL = this.buildCommand();
 			if (this.hasOptions()) {
@@ -198,10 +196,21 @@ public class QueryBuilder {
 		return (this.ARGUMENTS != null) && (this.ARGUMENTS.length > 0);
 	}
 	
+	/**
+	 * Returns whether this {@link QueryBuilder} has changed since the last call to {@link #build()}.
+	 * 
+	 * @return Whether a change has taken place since the last call to {@link #build()}.
+	 */
+	public boolean hasChanged() {
+		return (this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS);
+	}
+	
+	/* Supertype Override Methods */
+	
 	@Override
 	public QueryBuilder clone() {
 		QueryBuilder newQuery = new QueryBuilder(this.COMMAND);
-		if (this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS || this.CHANGED_RESULTS) {
+		if (this.hasChanged()) {
 			this.build();
 		}
 		newQuery.setCacheArguments(this.buildArguments());
@@ -263,7 +272,7 @@ public class QueryBuilder {
 	}
 
 	private String buildOptions() {
-		if (this.CHANGED_OPTIONS) {
+		if (this.CHANGED_OPTIONS || this.haveOptionsChanged()) {
 			if (this.hasOptions()) {
 				ArrayList<String> discoveredOptions = new ArrayList<String>();
 				for (QueryBuilder iteratedQuery : this.getOptions()) {
@@ -279,6 +288,19 @@ public class QueryBuilder {
 	}
 
 	/* Logic Methods */
+	
+	private boolean haveOptionsChanged() {
+		boolean flag = false;
+		if (this.OPTIONS != null) {
+			for (QueryBuilder iteratedOption : this.OPTIONS) {
+				if (iteratedOption.hasChanged()) {
+					flag = true;
+					break;
+				}
+			}
+		}
+		return flag;
+	}
 	
 	private static boolean validateArgument(Argument passedArgument) {
 		if (passedArgument == null) {
