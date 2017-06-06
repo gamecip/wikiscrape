@@ -142,8 +142,7 @@ public class QueryBuilder {
 	 * @return This {@link QueryBuilder}, in finalized {@code String} form.
 	 */
 	public String build() {
-		boolean requiresRebuild = (this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS || this.haveOptionsChanged());
-		if (requiresRebuild) {
+		if (this.hasChanged()) {
 			this.CACHE_FINAL = this.buildCommand();
 			if (this.hasOptions()) {
 				this.CACHE_FINAL = concatenateOptions(this.CACHE_FINAL, this.buildOptions());
@@ -203,7 +202,7 @@ public class QueryBuilder {
 	 * @return Whether a change has taken place since the last call to {@link #build()}.
 	 */
 	public boolean hasChanged() {
-		return (this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS);
+		return (this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS || this.haveOptionsChanged());
 	}
 	
 	/* Supertype Override Methods */
