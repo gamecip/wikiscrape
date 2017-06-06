@@ -1,7 +1,6 @@
 package wikiscrape.utilities;
 
 import java.util.Arrays;
-import java.util.function.Function;
 
 import wikiscrape.queries.Argument;
 
@@ -79,7 +78,7 @@ public class ScrapeUtilities {
 	}
 	
 	/**
-	 * Creates an array of {@link Arguments} from an array of {@code Strings} representing the array of command syntaxes to use.
+	 * Creates an array of {@link Argument}s from an array of {@code Strings} representing the array of command syntaxes to use.
 	 * 
 	 * @param passedCommands - The array of command syntaxes to use
 	 * @return An array of suitably instantiated {@link Argument} instances.
@@ -93,7 +92,7 @@ public class ScrapeUtilities {
 	}
 	
 	/**
-	 * Creates an array of {@link Arguments} from two arrays of {@code Strings}, the first representing the array of command syntaxes,
+	 * Creates an array of {@link Argument}s from two arrays of {@code Strings}, the first representing the array of command syntaxes,
 	 * and the second representing the array of result syntaxes.
 	 * <p>
 	 * The passedCommands array must equal or exceed the passedResults array in size.
