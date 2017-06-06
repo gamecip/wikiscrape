@@ -128,6 +128,16 @@ public class QueryBuilder {
 		this.CHANGED_ARGUMENTS = true;
 		return this;
 	}
+	
+	/**
+	 * Sets the arguments of this {@link QueryBuilder} to the {@link List} of passed arguments.
+	 * 
+	 * @param passedArguments - The new arguments to use for this {@link QueryBuilder}.
+	 * @return {@code this}, for the purpose of method chaining.
+	 */
+	public QueryBuilder setArguments(List<Argument> passedList) {
+		return this.setArguments(passedList.toArray(new Argument[]{}));
+	}
 
 	/**
 	 * Sets the options of this {@link QueryBuilder} to the passed {@link QueryBuilder}s.
@@ -137,6 +147,18 @@ public class QueryBuilder {
 	 */
 	public QueryBuilder setOptions(QueryBuilder... passedOptions) {
 		this.OPTIONS = Collections.unmodifiableList(Arrays.asList(passedOptions));
+		this.CHANGED_OPTIONS = true;
+		return this;
+	}
+	
+	/**
+	 * Sets the options of this {@link QueryBuilder} to the passed {@link List} of {@link QueryBuilder}s.
+	 * 
+	 * @param passedOptions - the {@link QueryBuilder}s to set as the options for this {@link QueryBuilder} intance.
+	 * @return {@code this}, for the purpose of method chaining.
+	 */
+	public QueryBuilder setOptions(List<QueryBuilder> passedOptions) {
+		this.OPTIONS = Collections.unmodifiableList(passedOptions);
 		this.CHANGED_OPTIONS = true;
 		return this;
 	}
