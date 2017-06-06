@@ -36,6 +36,17 @@ public class TableEntry {
 	}
 	
 	/**
+	 * Convenience method that calls {@link #getEntry(int)} using {@link EnumEntry#getIndex()} as the index.
+	 * 
+	 * @param passedEntry - The {@link EnumEntry} to use
+	 * @return The String stored at that column index.
+	 * @see {@link EnumEntry}, {@link #getEntry(int)}
+	 */
+	public String getEntry(EnumEntry passedEntry) {
+		return this.getEntry(passedEntry.getIndex());
+	}
+	
+	/**
 	 * Returns the entire array of entries from this {@link TableEntry} object.
 	 * 
 	 * @return The array of entries from this instance.
