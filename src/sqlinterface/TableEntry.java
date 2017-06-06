@@ -19,7 +19,7 @@ public class TableEntry {
 	}
 	
 	/**
-	 * Returns an entry from this TableEntry corresponding to the passed {@code int}.
+	 * Returns an entry from this {@link TableEntry} corresponding to the passed {@code int}.
 	 * <p>
 	 * The passed {@code int} can be thought of as the column number, starting at zero.
 	 * <p>
@@ -33,6 +33,15 @@ public class TableEntry {
 			return this.ENTRIES[passedEntryIndex];
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns the entire array of entries from this {@link TableEntry} object.
+	 * 
+	 * @return The array of entries from this instance.
+	 */
+	public String[] getEntries() {
+		return this.ENTRIES;
 	}
 	
 	// Logic Methods
