@@ -201,6 +201,9 @@ public class QueryBuilder {
 	@Override
 	public QueryBuilder clone() {
 		QueryBuilder newQuery = new QueryBuilder(this.COMMAND);
+		if (this.CHANGED_ARGUMENTS || this.CHANGED_OPTIONS || this.CHANGED_RESULTS) {
+			this.build();
+		}
 		newQuery.setCacheArguments(this.buildArguments());
 		newQuery.setCacheCommand(this.buildCommand());
 		newQuery.setCacheOptions(this.buildOptions());
