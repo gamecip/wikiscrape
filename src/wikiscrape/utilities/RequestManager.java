@@ -19,6 +19,8 @@ public class RequestManager {
 	private String API_STRING;
 	private String ACTION_TYPE;
 	
+	private String POSTFIX = "format=json&formatversion=2";
+	
 	/**
 	 * Creates a new {@link RequestManager} with the wiki-standard connection types and api strings.
 	 * 
@@ -52,7 +54,8 @@ public class RequestManager {
 	 */
 	public JsonObject request(QueryBuilder passedQuery) {
 		try {
-			URL generatedURL = new URL(String.format("%s://%s%s&%s&format=json", this.CONNECTION_TYPE, this.BASE_URL, this.API_STRING, this.ACTION_TYPE, passedQuery.build()));
+			URL generatedURL = new URL(String.format("%s://%s%s%s&%s&%s", this.CONNECTION_TYPE, this.BASE_URL, this.API_STRING, this.ACTION_TYPE, passedQuery.build(), POSTFIX));
+			System.out.println(generatedURL.toExternalForm());
 		    HttpURLConnection request = (HttpURLConnection) generatedURL.openConnection();
 		    request.connect();
 		    JsonParser parser = new JsonParser();
@@ -64,6 +67,15 @@ public class RequestManager {
 			passedException.printStackTrace();
 		}
 		return null;
+	}
+	
+	/**
+	 * Sets {@code String} to be postfixed to the posted request.
+	 * 
+	 * @param passedPostfixString - The {@code String} to be postfixed.
+	 */
+	public void setPostfix(String passedPostfixString) {
+		this.POSTFIX = passedPostfixString;
 	}
 
 }
