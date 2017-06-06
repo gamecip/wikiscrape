@@ -49,6 +49,8 @@ public class BatchIterator<T> implements Iterator<List<T>>, Iterable<List<T>>{
 	public BatchIterator(T[] passedGenerationList, int passedBatchSize) {
 		this(Arrays.asList(passedGenerationList), passedBatchSize);
 	}
+	
+	/* Iterator compliance methods */
 
 	@Override
 	public boolean hasNext() {
@@ -61,6 +63,8 @@ public class BatchIterator<T> implements Iterator<List<T>>, Iterable<List<T>>{
 		this.INDEX += sublist.size();
 		return sublist;
 	}
+	
+	/* Iterable compliance method */
 
 	@Override
 	public Iterator<List<T>> iterator() {
