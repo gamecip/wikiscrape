@@ -16,7 +16,7 @@ public class Queries {
 	private static final String STRING_REVISIONS = "revisions";
 	
 	// Known Actions
-	public static final String QUERY = "query";
+	public static final String QUERY = "action=query";
 	
 	// Known Arguments	
 	public static final Argument EXTRACTS = new Argument("extracts");

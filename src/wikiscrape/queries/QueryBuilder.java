@@ -162,7 +162,7 @@ public class QueryBuilder {
 		this.CHANGED_OPTIONS = true;
 		return this;
 	}
-
+ 
 	/**
 	 * Returns the total {@code String} form build of this {@link QueryBuilder}, including all current arguments and options.
 	 * 
