@@ -43,4 +43,38 @@ public class Queries {
 	public static final QueryBuilder OPTION_SECTIONFORMAT = new QueryBuilder("exsectionformat", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACTLIMIT = new QueryBuilder("exlimit", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", STRING_EXTRACT);
+	
+	/**
+	 * Convenience Factory method that {@link #clone()}s the passed {@link QueryBuilder} and calls {@link QueryBuilder#setOptions(QueryBuilder...)} on it.
+	 * 
+	 * @param passedQuery - The {@link QueryBuilder} to {@link #clone()}
+	 * @param passedOptions - The {@link QueryBuilder} instances to set as options
+	 * @return A new {@link QueryBuilder} instance, with the passed options.
+	 */
+	public static QueryBuilder newWith(QueryBuilder passedQuery, QueryBuilder ... passedOptions) {
+		return passedQuery.clone().setOptions(passedOptions);
+	}
+	
+	/**
+	 * Convenience Factory method that {@link #clone()}s the passed {@link QueryBuilder} and calls {@link QueryBuilder#setArguments(Argument...)} on it.
+	 * 
+	 * @param passedQuery - The {@link QueryBuilder} to {@link #clone()}
+	 * @param passedArguments - The {@link Argument} instances to set as arguments
+	 * @return A new {@link QueryBuilder} instance, with the passed arguments.
+	 */
+	public static QueryBuilder newWith(QueryBuilder passedQuery, Argument ... passedArguments) {
+		return passedQuery.clone().setArguments(passedArguments);
+	}
+	
+	/**
+	 * Convenience Factory method that {@link #clone()}s the passed {@link QueryBuilder} and calls both {@link QueryBuilder#setCacheOptions(String)} and {@link QueryBuilder#setArguments(Argument...)} on it.
+	 * 
+	 * @param passedQuery - The {@link QueryBuilder} to {@link #clone()}
+	 * @param passedArguments - The {@link Argument} instances to set as arguments
+	 * @param passedOptions - The {@link QueryBuilder} instances to set as options
+	 * @return A new {@link QueryBuilder} instance, with the passed arguments and options.
+	 */
+	public static QueryBuilder newWith(QueryBuilder passedQuery, Argument[] passedArguments, QueryBuilder[] passedOptions) {
+		return passedQuery.clone().setArguments(passedArguments).setOptions(passedOptions);
+	}
 }
