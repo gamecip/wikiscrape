@@ -1,9 +1,9 @@
 package sqlinterface;
 
 public enum EnumEntry {
-	
-	TITLE(0, "title", "TEXT"),
-	PAGE_ID(1, "pageid", "INTEGER"),
+
+	PAGE_ID(0, "pageid", "INTEGER"),
+	TITLE(1, "title", "TEXT"),
 	REVISION_ID(2, "revisionid", "INTEGER"),
 	YEAR(3, "year", "INTEGER"),
 	TEXT_INTRO(4, "textintro", "TEXT"),
