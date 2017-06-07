@@ -17,7 +17,7 @@ public class Queries {
 	private static final String STRING_PAGEIDS = "pageids";
 	
 	// Known Actions
-	public static final String QUERY = "action=query";
+	public static final String ACTION_QUERY = "action=query";
 	
 	// Known Arguments	
 	public static final Argument EXTRACTS = new Argument("extracts");
