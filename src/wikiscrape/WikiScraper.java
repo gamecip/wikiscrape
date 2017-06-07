@@ -27,12 +27,14 @@ public class WikiScraper {
 
 	public static void main(String[] passedArguments) {
 		
+		// TODO: Parse launch arguments passed to application, use as arguments to objects here
+		
 		// Construct internal objects
 		String wiki_url = "en.wikipedia.org";
 		RequestManager scraper = new RequestManager(wiki_url);
 		QueryBuilder query = new QueryBuilder(Queries.PAGES_BY_ID);
 		
-		// TODO!
+		// TODO: Solution to username password security problem
 		String sqlurl = "";
 		String tablename = "";
 		String username = "";
@@ -49,6 +51,8 @@ public class WikiScraper {
 				String revisionID = results.getString(1);
 				updateMap.put(pageID, revisionID);
 			}
+			
+			// TODO: Mode for discovery of new pages
 			
 			// Of page list, compare revision ids to build list of extracts to redownload
 			BatchIterator<String> iterator = new BatchIterator<String>(updateMap.keySet().toArray(new String[]{}), MAX_QUERY_SIZE);
@@ -76,6 +80,7 @@ public class WikiScraper {
 						System.out.println(String.format("Page with id %d is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
 					}
 				}
+				// TODO: Handling of batchcontinue
 			}
 			
 			// Redownload extracts
@@ -98,6 +103,7 @@ public class WikiScraper {
 						System.out.println(String.format("Page with id %d is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
 					}
 				}
+				// TODO: Handling of batchcontinue
 			}
 			
 			// Push to database
