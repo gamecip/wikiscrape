@@ -7,6 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.Function;
 
+/**
+ * Class that provides support for several common SQL operations, using {@link TableEntry} and {@link EnumEntry} for ease of use.
+ * 
+ * @author Malcolm Riley
+ */
 public class SQLInterface {
 
 	private Connection CONNECTION;
@@ -20,6 +25,15 @@ public class SQLInterface {
 	private static final Function<TableEntry, String> MAPPER_INSERT = (entry) -> { return String.format("(%s)", fromTableEntry(entry)); };
 	private static final Function<TableEntry, String> MAPPER_UPDATE = (entry) -> { return String.format("%s WHERE %s", fromTableEntry(entry), String.format("%s = ?", EnumEntry.PAGE_ID.getEntryName())); };
 
+	/**
+	 * Constructs a new {@link SQLInterface} object using the passed parameters.
+	 * 
+	 * @param passedDatabaseURL - The URL of the database to access
+	 * @param passedTableName - The name of the table that this {@link SQLInterface} will alter
+	 * @param passedUsername - The username to use for accessing the SQL database
+	 * @param passedPassword - The password that will be used for accessing the SQL database
+	 * @throws SQLException If an exception occurs while setting up the connection to the SQL database
+	 */
 	public SQLInterface(String passedDatabaseURL, String passedTableName, String passedUsername, String passedPassword) throws SQLException {
 		this.CONNECTION = DriverManager.getConnection(passedDatabaseURL, passedUsername, passedPassword);
 		this.TABLE_NAME = passedTableName;
