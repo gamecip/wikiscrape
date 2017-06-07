@@ -16,6 +16,10 @@ public class Queries {
 	private static final String STRING_REVISIONS = "revisions";
 	private static final String STRING_PAGEIDS = "pageids";
 	
+	public static final String FIELD_QUERY = "query";
+	public static final String FIELD_PAGES = "pages";
+	public static final String FIELD_PAGEID = "pageid";
+	
 	// Known Actions
 	public static final String ACTION_QUERY = "action=query";
 	
