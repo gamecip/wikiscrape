@@ -16,7 +16,8 @@ public class TSVParser {
 		String testpath = "/Users/macintosh/Documents/Java Projects/gamecip/corpus/";
 		List<Path> discoveredFiles = TSVUtilities.getFilesInDirectory(testpath, TSV_EXTENSION);
 		List<TableEntry> generatedEntries = new ArrayList<TableEntry>();
-		discoveredFiles.stream().forEach(path -> TSVUtilities.buildEntries(generatedEntries, path));
+		discoveredFiles.forEach(path -> TSVUtilities.buildEntries(generatedEntries, path));
+		generatedEntries.forEach(entry -> entry.swapEntries(0, 1)); // Swap first two entries so that the primary index is page ID (nonvolatile) and not page title (volatile)
 		
 		// Push entries to database
 	}
