@@ -11,14 +11,16 @@ public class Queries {
 	};
 	
 	// Strings
-	private static final String STRING_EXTRACT = "extract";
-	private static final String STRING_PROPERTIES = "prop";
-	private static final String STRING_REVISIONS = "revisions";
-	private static final String STRING_PAGEIDS = "pageids";
+	public static final String STRING_EXTRACT = "extract";
+	public static final String STRING_PROPERTIES = "prop";
+	public static final String STRING_PAGEIDS = "pageids";
 	
 	public static final String FIELD_QUERY = "query";
 	public static final String FIELD_PAGES = "pages";
 	public static final String FIELD_PAGEID = "pageid";
+	public static final String FIELD_MISSING = "missing";
+	public static final String FIELD_REVISIONS = "revisions";
+	public static final String FIELD_REVID = "revid";
 	
 	// Known Actions
 	public static final String ACTION_QUERY = "action=query";
@@ -39,13 +41,13 @@ public class Queries {
 	public static final Argument OPTION_SECTIONFORMAT_RAW = new Argument("raw", STRING_EXTRACT);
 	public static final Argument OPTION_INDEX_PAGEIDS = new Argument("indexpageids", STRING_PAGEIDS);
 	
-	public static final Argument REVISIONS = new Argument(STRING_REVISIONS, STRING_REVISIONS);
+	public static final Argument REVISIONS = new Argument(FIELD_REVISIONS, FIELD_REVISIONS);
 	
 	// Known "Get" Queries - Clone these
 	public static final QueryBuilder GET_PROPERTIES = new QueryBuilder(new Argument(STRING_PROPERTIES));
 	
 	// Optional Queries - Clone these
-	public static final QueryBuilder OPTION_REVISIONS = new QueryBuilder("rvprop", STRING_REVISIONS);
+	public static final QueryBuilder OPTION_REVISIONS = new QueryBuilder("rvprop", FIELD_REVISIONS);
 	public static final QueryBuilder OPTION_SECTIONFORMAT = new QueryBuilder("exsectionformat", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACTLIMIT = new QueryBuilder("exlimit", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", STRING_EXTRACT);
