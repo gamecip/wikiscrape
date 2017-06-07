@@ -36,6 +36,27 @@ public class TableEntry {
 	}
 	
 	/**
+	 * Convenience method to swap the entries at the passed indices.
+	 * <p>
+	 * This is a fix for the fact that the first column in the original tsv files is the article name, which
+	 * is volatile and therefore should not be used as the SQL primary key.
+	 * 
+	 * @param passedFirstIndex - The index of the entry to swap with {@code passedSecondIndex}
+	 * @param passedSecondIndex - The index of the entry to swap with {@code passedFirstIndex}
+	 * @throws IllegalArgumentException If {@code passedFirstIndex} or {@code passedSecondIndex} are out of array bounds.
+	 */
+	public void swapEntries(int passedFirstIndex, int passedSecondIndex) {
+		if (!validate(passedFirstIndex) || !validate(passedSecondIndex)) {
+			throw new IllegalArgumentException("May not swap indices out of array bounds!");
+		}
+		String firstIndex = this.ENTRIES[passedFirstIndex];
+		String secondIndex = this.ENTRIES[passedSecondIndex];
+		
+		this.ENTRIES[passedFirstIndex] = secondIndex;
+		this.ENTRIES[passedSecondIndex] = firstIndex;
+	}
+	
+	/**
 	 * Convenience method that calls {@link #getEntry(int)} using {@link EnumEntry#getIndex()} as the index.
 	 * 
 	 * @param passedEntry - The {@link EnumEntry} to use
