@@ -35,7 +35,7 @@ public class WikiScraper {
 		QueryBuilder query = new QueryBuilder(Queries.PAGES_BY_ID);
 		
 		// TODO: Solution to username password security problem
-		String sqlurl = "";
+		String sqlurl = "jdbc:mysql://localhost:3306/"; // see https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html
 		String tablename = "";
 		String username = "";
 		String password = "";
