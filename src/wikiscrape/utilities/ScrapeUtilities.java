@@ -98,6 +98,16 @@ public class ScrapeUtilities {
 	}
 	
 	/**
+	 * Creates an array of {@link Argument}s from a {@link List} of {@code Strings} representing the array of command syntaxes to use.
+	 * 
+	 * @param passedList - The {@link List} of {@code Strings} to use
+	 * @return An array of suitably instantiated {@link Argument} instances.
+	 */
+	public static Argument[] fromStrings(List<String> passedList) {
+		return fromStrings(passedList.toArray(new String[]{}));
+	}
+	
+	/**
 	 * Creates an array of {@link Argument}s from two arrays of {@code Strings}, the first representing the array of command syntaxes,
 	 * and the second representing the array of result syntaxes.
 	 * <p>
