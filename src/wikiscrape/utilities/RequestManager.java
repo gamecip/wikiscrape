@@ -27,7 +27,7 @@ public class RequestManager {
 	 * @param passedStringURL
 	 */
 	public RequestManager(String passedStringURL) {
-		this("https", passedStringURL, "/w/api.php?", Queries.QUERY);
+		this("https", passedStringURL, "/w/api.php?", Queries.ACTION_QUERY);
 	}
 	
 	/**
