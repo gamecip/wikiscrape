@@ -22,7 +22,7 @@ public class Queries {
 	// Known Arguments	
 	public static final Argument EXTRACTS = new Argument("extracts");
 	
-	public static final Argument PAGES_BY_ID = new Argument(STRING_PAGEIDS);
+	public static final Argument PAGES_BY_ID = new Argument(STRING_PAGEIDS, STRING_PAGEIDS);
 	public static final Argument PAGES_BY_TITLE = new Argument("titles");
 	public static final Argument PAGES_BY_REVISION_ID = new Argument("revids");
 	
