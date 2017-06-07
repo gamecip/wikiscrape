@@ -1,10 +1,16 @@
 package wikiscrape.utilities;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
+import sqlinterface.EnumEntry;
+import sqlinterface.TableEntry;
 import wikiscrape.queries.Argument;
 
 public class ScrapeUtilities {
+	
+	private static final Function<TableEntry, Argument> PAGES_FROM_TABLE_ENTRY = (TableEntry entry) -> { return new Argument(entry.getEntry(EnumEntry.PAGE_ID), entry.getEntry(EnumEntry.PAGE_ID)); };
 
 	private ScrapeUtilities() {
 	};
@@ -110,6 +116,27 @@ public class ScrapeUtilities {
 			argumentArray[iterator] = new Argument(passedCommands[iterator], passedResults[iterator]);
 		}
 		return argumentArray;
+	}
+	
+	/**
+	 * Convenience method returns an array of {@link Argument} instances from the pageids within the passed {@link TableEntry} objects.
+	 * <p>
+	 * Wraps around {@link #fromTableEntries(List)}.
+	 * @param passedTableEntries - The {@link TableEntry} objects to use
+	 * @return An array of instantiated {@link Argument}s.
+	 */
+	public static Argument[] fromTableEntries(TableEntry ... passedTableEntries) {
+		return fromTableEntries(Arrays.asList(passedTableEntries));
+	}
+
+	/**
+	 * Convenience method returns an array of {@link Argument} instances from the pageids within the passed {@link List} of {@link TableEntry} objects.
+	 * 
+	 * @param passedList - The {@link List} of {@link TableEntry} objects to use
+	 * @return An array of instantiated {@link Argument}s.
+	 */
+	public static Argument[] fromTableEntries(List<TableEntry> passedList) {
+		return passedList.stream().map(PAGES_FROM_TABLE_ENTRY).toArray(val -> { return new Argument[val]; });
 	}
 	
 	/**
