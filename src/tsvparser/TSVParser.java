@@ -15,7 +15,7 @@ public class TSVParser {
 
 	public static void main(String[] passedArguments) {
 		// Construct objects
-		String path = "/Users/macintosh/Documents/Java Projects/gamecip/corpus/";
+		String path = "";
 		
 		// TODO!
 		String sqlurl = "";
