@@ -21,6 +21,9 @@ public class Queries {
 	public static final String FIELD_MISSING = "missing";
 	public static final String FIELD_REVISIONS = "revisions";
 	public static final String FIELD_REVID = "revid";
+	public static final String FIELD_BATCH_COMPLETE = "batchcomplete";
+	public static final String FIELD_CONTINUE = "continue";
+	public static final String FIELD_CONTINUE_FROM = "accontinue";
 	
 	// Known Actions
 	public static final String ACTION_QUERY = "action=query";
@@ -51,6 +54,8 @@ public class Queries {
 	public static final QueryBuilder OPTION_SECTIONFORMAT = new QueryBuilder("exsectionformat", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACTLIMIT = new QueryBuilder("exlimit", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", STRING_EXTRACT);
+	public static final QueryBuilder OPTION_CONTINUE = new QueryBuilder(FIELD_CONTINUE, FIELD_CONTINUE);
+	public static final QueryBuilder OPTION_CONTINUE_FROM = new QueryBuilder(FIELD_CONTINUE_FROM, FIELD_CONTINUE_FROM);
 	
 	/**
 	 * Convenience Factory method that {@link #clone()}s the passed {@link QueryBuilder} and calls {@link QueryBuilder#setOptions(QueryBuilder...)} on it.
