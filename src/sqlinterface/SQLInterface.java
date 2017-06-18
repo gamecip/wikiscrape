@@ -94,7 +94,7 @@ public class SQLInterface {
 	 * @return The {@link ResultSet} from the command's execution.
 	 */
 	public ResultSet update(TableEntry passedTableEntry) {
-		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, buildForEach(MAPPER_UPDATE, passedTableEntry)) + ";";
+		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, buildForEach(MAPPER_UPDATE, new TableEntry[]{passedTableEntry})) + ";";
 		try {
 			PreparedStatement statement = this.obtain(command);
 			for (int iterator = 0; iterator < EnumEntry.values().length; iterator++) {
@@ -125,7 +125,7 @@ public class SQLInterface {
 		}
 	}
 
-	private static <T> String buildForEach(Function<T, String> passedMapper, T... passedObjects) {
+	private static <T> String buildForEach(Function<T, String> passedMapper, T[] passedObjects) {
 		if (passedObjects.length > 1) {
 			StringBuilder builder = new StringBuilder();
 			for (int iterator = 0; iterator < passedObjects.length; iterator++) {
