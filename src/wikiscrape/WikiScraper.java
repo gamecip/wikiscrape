@@ -111,7 +111,6 @@ public class WikiScraper {
 	 * Populates the {@code Object} instances in the passed {@link HashMap} using the passed objects.
 	 * <p>
 	 * Of particular importance is the {@link BiConsumer<T, JsonElement>} object; this should populate the passed {@link TableEntry} from the passed {@link JsonElement}.
-	 * <p>
 	 * 
 	 * @param passedWikiScraper - The {@link RequestManager} instance to use
 	 * @param passedQuery - The {@link QueryBuilder} that will be used for the query
