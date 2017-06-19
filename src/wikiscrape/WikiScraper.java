@@ -35,7 +35,7 @@ public class WikiScraper {
 		// Construct internal objects
 		String wiki_url = "en.wikipedia.org";
 		RequestManager scraper = new RequestManager(wiki_url);
-		QueryBuilder query = new QueryBuilder(Queries.PAGES_BY_ID);
+		QueryBuilder query = Queries.GET_PAGES.clone();
 
 		// TODO: Solution to username password security problem
 		String sqlurl = "jdbc:mysql://localhost:3306/"; // see https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html
