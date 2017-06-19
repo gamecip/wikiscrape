@@ -147,7 +147,7 @@ public class WikiScraper {
 						passedPopulator.accept(entry, iteratedElement);
 					}
 					else {
-						// TODO: Additional handling?
+						// TODO: Additional handling? What to do if page is missing?
 						System.out.println(String.format("Page with id [%d] is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
 					}
 				}
