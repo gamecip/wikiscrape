@@ -89,7 +89,7 @@ public class WikiScraper {
 				String[] categories = new String[categoriesArray.size()];
 				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
 					String categoriesString = categoriesArray.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
-					categoriesString = categoriesString.substring("Category:".length()); // prune "Category" from each returned category "title"
+					categoriesString = categoriesString.substring("Category:".length()); // prune "Category:" from each returned category "title"
 					categories[iterator] = categoriesString;
 				}
 				entry.setEntry(EnumEntry.CATEGORIES, ScrapeUtilities.concatenateArguments(categories)); // Concatenate using "|" sandwiched between
