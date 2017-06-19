@@ -98,7 +98,8 @@ public class WikiScraper {
 			// Redownload text extracts
 			query.setOptions(getPagetextQuery());
 			BiConsumer<TableEntry, JsonElement> extractsPopulator = (entry, element) -> {
-				//TODO: Populate TableEntry from JsonElement
+				String extracts = element.getAsJsonObject().get(Queries.FIELD_EXTRACT).getAsString();
+				entry.setEntry(EnumEntry.TEXT_FULL, extracts);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 			
