@@ -57,6 +57,7 @@ public class Queries {
 	public static final QueryBuilder OPTION_SECTIONFORMAT = new QueryBuilder("exsectionformat", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACTLIMIT = new QueryBuilder("exlimit", STRING_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", STRING_EXTRACT);
+	public static final QueryBuilder OPTION_EXTRACT_INTRO = null;
 	public static final QueryBuilder OPTION_CONTINUE = new QueryBuilder(FIELD_CONTINUE, FIELD_CONTINUE);
 	public static final QueryBuilder OPTION_CONTINUE_FROM = new QueryBuilder(FIELD_CONTINUE_FROM, FIELD_CONTINUE_FROM);
 	
