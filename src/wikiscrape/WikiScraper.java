@@ -1,5 +1,6 @@
 package wikiscrape;
 
+import java.io.FileNotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -19,8 +20,10 @@ import wikiscrape.queries.Argument;
 import wikiscrape.queries.Queries;
 import wikiscrape.queries.QueryBuilder;
 import wikiscrape.utilities.BatchIterator;
+import wikiscrape.utilities.JsonObjectParser;
 import wikiscrape.utilities.QueryIterator;
 import wikiscrape.utilities.RequestManager;
+import wikiscrape.utilities.ScrapeConfig;
 import wikiscrape.utilities.ScrapeUtilities;
 
 public class WikiScraper {
@@ -30,21 +33,13 @@ public class WikiScraper {
 
 	public static void main(String[] passedArguments) {
 
-		// TODO: Parse launch arguments passed to application, use as arguments to objects here
-
 		// Construct internal objects
-		String wiki_url = "en.wikipedia.org";
-		RequestManager scraper = new RequestManager(wiki_url);
+		ScrapeConfig configuration = getConfig("config.json");
+		RequestManager scraper = new RequestManager(configuration.getWikiURL());
 		QueryBuilder query = Queries.GET_PAGES.clone();
 
-		// TODO: Solution to username password security problem
-		String sqlurl = "jdbc:mysql://localhost:3306/"; // see https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html
-		String tablename = "";
-		String username = "";
-		String password = "";
-
 		try {
-			SQLInterface sqlInterface = new SQLInterface(sqlurl, tablename, username, password);
+			SQLInterface sqlInterface = new SQLInterface(configuration.getSQLURL(), configuration.getTableName(), configuration.getUsername(), configuration.getPassword());
 
 			// Build page update map from database
 			ResultSet results = sqlInterface.select(EnumEntry.PAGE_ID, EnumEntry.REVISION_ID);
@@ -58,13 +53,11 @@ public class WikiScraper {
 			HashMap<String, TableEntry> databaseUpdates = new HashMap<String, TableEntry>();
 			// TODO: Mode for discovery of new pages - use above HashMap
 			// TODO: Store "year" in TableEntry using the aforementioned mode
-			
-			// Compare Revisions
-			
-			Function<JsonObject, String> keyMapper = (object) -> { return object.get(Queries.FIELD_PAGEID).getAsString(); };
-			Supplier<TableEntry> tableEntrySupplier = () -> { return new TableEntry(new String[EnumEntry.values().length]); };
 
 			// Compare Revisions
+			Function<JsonObject, String> keyMapper = (object) -> { return object.get(Queries.FIELD_PAGEID).getAsString(); };
+			Supplier<TableEntry> tableEntrySupplier = () -> { return new TableEntry(new String[EnumEntry.values().length]); };
+			
 			query.setOptions(getRevisionsQuery());
 			BiConsumer<TableEntry, JsonObject> updateMapPopulator = (entry, object) -> {
 				String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
@@ -164,6 +157,17 @@ public class WikiScraper {
 					}
 				}
 			}
+		}
+	}
+	
+	private static ScrapeConfig getConfig(String passedFilePath) {
+		try {
+			JsonObjectParser<ScrapeConfig> configReader = new JsonObjectParser<ScrapeConfig>(passedFilePath, ScrapeConfig.class);
+			return configReader.fromJson();
+		}
+		catch (FileNotFoundException passedException) {
+			passedException.printStackTrace();
+			return null;
 		}
 	}
 	
