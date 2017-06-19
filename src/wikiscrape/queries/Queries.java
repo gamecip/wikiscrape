@@ -11,10 +11,9 @@ public class Queries {
 	};
 	
 	// Strings
-	public static final String STRING_EXTRACT = "extract";
-	public static final String STRING_PROPERTIES = "prop";
-	public static final String STRING_PAGEIDS = "pageids";
-	
+	public static final String FIELD_EXTRACT = "extract";
+	public static final String FIELD_PROPERTIES = "prop";
+	public static final String FIELD_PAGEIDS = "pageids";
 	public static final String FIELD_QUERY = "query";
 	public static final String FIELD_PAGES = "pages";
 	public static final String FIELD_PAGEID = "pageid";
@@ -25,15 +24,16 @@ public class Queries {
 	public static final String FIELD_CONTINUE = "continue";
 	public static final String FIELD_CONTINUE_FROM = "accontinue";
 	public static final String FIELD_PAGETITLE = "title";
+	public static final String FIELD_CATEGORIES = "categories";
 	
 	// Known Actions
 	public static final String ACTION_QUERY = "action=query";
 	
 	// Known Arguments	
 	public static final Argument EXTRACTS = new Argument("extracts");
-	public static final Argument CATEGORIES = new Argument("categories");
+	public static final Argument CATEGORIES = new Argument(FIELD_CATEGORIES);
 	
-	public static final Argument PAGES_BY_ID = new Argument(STRING_PAGEIDS, STRING_PAGEIDS);
+	public static final Argument PAGES_BY_ID = new Argument(FIELD_PAGEIDS, FIELD_PAGEIDS);
 	public static final Argument PAGES_BY_TITLE = new Argument("titles");
 	public static final Argument PAGES_BY_REVISION_ID = new Argument("revids");
 	
@@ -41,22 +41,22 @@ public class Queries {
 	public static final Argument REVISION_FLAGS = new Argument("flags", "minor");
 	public static final Argument REVISION_SIZE = new Argument("size", "size");
 	
-	public static final Argument OPTION_SECTIONFORMAT_PLAIN = new Argument("plain", STRING_EXTRACT);
-	public static final Argument OPTION_SECTIONFORMAT_WIKI = new Argument("wiki", STRING_EXTRACT);
-	public static final Argument OPTION_SECTIONFORMAT_RAW = new Argument("raw", STRING_EXTRACT);
-	public static final Argument OPTION_INDEX_PAGEIDS = new Argument("indexpageids", STRING_PAGEIDS);
+	public static final Argument OPTION_SECTIONFORMAT_PLAIN = new Argument("plain", FIELD_EXTRACT);
+	public static final Argument OPTION_SECTIONFORMAT_WIKI = new Argument("wiki", FIELD_EXTRACT);
+	public static final Argument OPTION_SECTIONFORMAT_RAW = new Argument("raw", FIELD_EXTRACT);
+	public static final Argument OPTION_INDEX_PAGEIDS = new Argument("indexpageids", FIELD_PAGEIDS);
 	
 	public static final Argument REVISIONS = new Argument(FIELD_REVISIONS, FIELD_REVISIONS);
 	
 	// Known "Get" Queries - Clone these
 	public static final QueryBuilder GET_PAGES = new QueryBuilder(Queries.PAGES_BY_ID);
-	public static final QueryBuilder GET_PROPERTIES = new QueryBuilder(new Argument(STRING_PROPERTIES));
+	public static final QueryBuilder GET_PROPERTIES = new QueryBuilder(new Argument(FIELD_PROPERTIES));
 	
 	// Optional Queries - Clone these
 	public static final QueryBuilder OPTION_REVISIONS = new QueryBuilder("rvprop", FIELD_REVISIONS);
-	public static final QueryBuilder OPTION_SECTIONFORMAT = new QueryBuilder("exsectionformat", STRING_EXTRACT);
-	public static final QueryBuilder OPTION_EXTRACTLIMIT = new QueryBuilder("exlimit", STRING_EXTRACT);
-	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", STRING_EXTRACT);
+	public static final QueryBuilder OPTION_SECTIONFORMAT = new QueryBuilder("exsectionformat", FIELD_EXTRACT);
+	public static final QueryBuilder OPTION_EXTRACTLIMIT = new QueryBuilder("exlimit", FIELD_EXTRACT);
+	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", FIELD_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACT_INTRO = null;
 	public static final QueryBuilder OPTION_CONTINUE = new QueryBuilder(FIELD_CONTINUE, FIELD_CONTINUE);
 	public static final QueryBuilder OPTION_CONTINUE_FROM = new QueryBuilder(FIELD_CONTINUE_FROM, FIELD_CONTINUE_FROM);
