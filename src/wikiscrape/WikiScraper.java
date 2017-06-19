@@ -88,11 +88,16 @@ public class WikiScraper {
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
-			// Redownload extracts
-			query.setOptions(getExtractsQuery());
+			// Redownload text extracts
+			query.setOptions(getPagetextQuery());
 			BiConsumer<TableEntry, JsonElement> extractsPopulator = (entry, element) -> {
 				//TODO: Populate TableEntry from JsonElement
 			};
+			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
+			
+			// Redownload intro text extracts
+			query.setOptions(getIntroTextQuery());
+			// Can use same BiConsumer for extracting intro text as both return extracts in "extracts" field
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 
 			// Push to database
@@ -161,8 +166,16 @@ public class WikiScraper {
 		revisions.setOptions(revisionOptions);
 		return revisions;
 	}
+	
+	private static QueryBuilder getIntroTextQuery() {
+		QueryBuilder introText = Queries.newWith(Queries.GET_PROPERTIES, Queries.EXTRACTS);
+		QueryBuilder introTextOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.OPTION_SECTIONFORMAT_RAW));
+		introTextOptions.setOptions(Queries.OPTION_EXTRACT_INTRO);
+		introText.setOptions(introTextOptions);
+		return introText;
+	}
 
-	private static QueryBuilder getExtractsQuery() {
+	private static QueryBuilder getPagetextQuery() {
 		QueryBuilder extracts = Queries.newWith(Queries.GET_PROPERTIES, Queries.EXTRACTS);
 		QueryBuilder extractOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.OPTION_SECTIONFORMAT_RAW));
 		extracts.setOptions(extractOptions);
