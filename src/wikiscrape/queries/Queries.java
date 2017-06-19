@@ -49,6 +49,7 @@ public class Queries {
 	public static final Argument REVISIONS = new Argument(FIELD_REVISIONS, FIELD_REVISIONS);
 	
 	// Known "Get" Queries - Clone these
+	public static final QueryBuilder GET_PAGES = new QueryBuilder(Queries.PAGES_BY_ID);
 	public static final QueryBuilder GET_PROPERTIES = new QueryBuilder(new Argument(STRING_PROPERTIES));
 	
 	// Optional Queries - Clone these
