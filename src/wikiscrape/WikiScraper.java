@@ -2,9 +2,11 @@ package wikiscrape;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -53,69 +55,48 @@ public class WikiScraper {
 				updateMap.put(pageID, revisionID);
 			}
 
-			// TODO: Mode for discovery of new pages
+			HashMap<String, TableEntry> databaseUpdates = new HashMap<String, TableEntry>();
+			// TODO: Mode for discovery of new pages - use above HashMap
+			
+			// Compare Revisions
+			
+			Function<JsonElement, String> keyMapper = (element) -> { return element.getAsJsonObject().get(Queries.FIELD_PAGEID).getAsString(); };
+			Supplier<TableEntry> tableEntrySupplier = () -> { return new TableEntry(new String[EnumEntry.values().length]); };
 
-			// Of page list, compare revision ids to build list of extracts to redownload
-			BatchIterator<String> iterator = new BatchIterator<String>(updateMap.keySet().toArray(new String[] {}), MAX_QUERY_SIZE);
-			ArrayList<String> requiresUpdate = new ArrayList<String>();
-
+			// Compare Revisions
 			query.setOptions(getRevisionsQuery());
-			QueryBuilder optionContinuation = Queries.OPTION_CONTINUE.clone();
-			QueryBuilder optionContinuationFrom = Queries.OPTION_CONTINUE_FROM.clone();
-			optionContinuation.setOptions(optionContinuationFrom);
-
-			for (List<String> iteratedList : iterator) {
-				Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
-				query.setArguments(pages);
-				QueryIterator queryIterator = new QueryIterator(scraper, query);
+			BiConsumer<TableEntry, JsonElement> updateMapPopulator = (entry, element) -> {
+				String discoveredPageTitle = element.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
+				String discoveredPageID = element.getAsJsonObject().get(Queries.FIELD_PAGEID).getAsString();
+				String discoveredRevisionID = element.getAsJsonObject().getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
+				String storedRevisionID = updateMap.get(discoveredPageID);
 				
-				for (JsonObject returnedJson : queryIterator) {
-					// Perform actual query
-					JsonArray array = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
-					for (JsonElement iteratedElement : array) {
-						if (!iteratedElement.getAsJsonObject().has(Queries.FIELD_MISSING)) {
-							String discoveredPageID = iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID).getAsString();
-							String discoveredRevisionID = iteratedElement.getAsJsonObject().getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
-							String storedRevisionID = updateMap.get(discoveredPageID);
+				entry.setEntry(EnumEntry.PAGE_ID, discoveredPageID);
+				entry.setEntry(EnumEntry.REVISION_ID, discoveredRevisionID);
+				entry.setEntry(EnumEntry.TITLE, discoveredPageTitle);
 
-							if (!storedRevisionID.equals(discoveredRevisionID)) {
-								requiresUpdate.add(discoveredPageID);
-							}
-						}
-						else {
-							// TODO: Additional handling?
-							System.out.println(String.format("Page with id %d is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
-						}
-					}
+				if (!storedRevisionID.equals(discoveredRevisionID)) {
+					databaseUpdates.put(discoveredPageID, entry);
 				}
-			}
+			};
+			populateMap(scraper, query, databaseUpdates, keyMapper, updateMapPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
+			
+			// Redownload categories
+			query.setOptions(getCategoriesQuery());
+			BiConsumer<TableEntry, JsonElement> categoriesPopulator = (entry, element) -> {
+				
+			};
+			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
 			// Redownload extracts
-			iterator = new BatchIterator<String>(requiresUpdate, MAX_PLAINTEXT_EXTRACTS);
-			ArrayList<TableEntry> updatedEntries = new ArrayList<TableEntry>();
 			query.setOptions(getExtractsQuery());
-			for (List<String> iteratedList : iterator) {
-				Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
-				query.setArguments(pages);
-				QueryIterator queryIterator = new QueryIterator(scraper, query);
+			BiConsumer<TableEntry, JsonElement> extractsPopulator = (entry, element) -> {
 				
-				for (JsonObject returnedJson : queryIterator) {
-					JsonArray array = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
-					for (JsonElement iteratedElement : array) {
-						if (!iteratedElement.getAsJsonObject().has(Queries.FIELD_MISSING)) {
-							
-							// TODO: Edit tableEntries
-							
-						}
-						else {
-							System.out.println(String.format("Page with id %d is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
-						}
-					}
-				}
-			}
+			};
+			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 
 			// Push to database
-			for (TableEntry iteratedEntry : updatedEntries) {
+			for (TableEntry iteratedEntry : databaseUpdates.values()) {
 				sqlInterface.update(iteratedEntry);
 			}
 		}
@@ -124,6 +105,56 @@ public class WikiScraper {
 			// If the SQLInterface cannot be constructed, there's no point in continuing
 			return;
 		}
+	}
+	
+	/**
+	 * Populates the {@code Object} instances in the passed {@link HashMap} using the passed objects.
+	 * <p>
+	 * Of particular importance is the {@link BiConsumer<T, JsonElement>} object; this should populate the passed {@link TableEntry} from the passed {@link JsonElement}.
+	 * <p>
+	 * 
+	 * @param passedWikiScraper - The {@link RequestManager} instance to use
+	 * @param passedQuery - The {@link QueryBuilder} that will be used for the query
+	 * @param passedMap - The {@link HashMap} of {@code Object<T>} instances, that will be populated and/or edited
+	 * @param passedKeyMapper - A {@link Function} that generates a single {@code Object<U>} from a single {@link JsonElement}
+	 * @param passedPopulator - A {@link BiConsumer<T, JsonElement>} object that populates a single {@code Object<T>} from a single {@link JsonElement}
+	 * @param passedTypeSupplier - A {@link Supplier<T>} instance to use provided the {@code Object<T>} does not already exist in {@code passedTableMap}
+	 * @param passedQueryBatchSize - The batch size to use while making queries.
+	 */
+	private static <T, U> void populateMap(RequestManager passedWikiScraper, QueryBuilder passedQuery, HashMap<U, T> passedMap, Function<JsonElement, U> passedKeyMapper, BiConsumer<T, JsonElement> passedPopulator, Supplier<T> passedTypeSupplier, int passedQueryBatchSize) {
+		BatchIterator<String> iterator = new BatchIterator<String>(passedMap.keySet().toArray(new String[]{}), passedQueryBatchSize);
+		for (List<String> iteratedList : iterator) {
+			Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
+			passedQuery.setArguments(pages);
+			
+			QueryIterator queryIterator = new QueryIterator(passedWikiScraper, passedQuery);
+			for (JsonObject returnedJson : queryIterator) {
+				JsonArray returnedJsonArray = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
+				for (JsonElement iteratedElement : returnedJsonArray) {
+					if (!iteratedElement.getAsJsonObject().has(Queries.FIELD_MISSING)) {
+						U key = passedKeyMapper.apply(iteratedElement);
+						T entry = passedMap.get(key);
+						if (passedMap.containsKey(key)) {
+							entry = passedMap.get(key);
+						}
+						else {
+							entry = passedTypeSupplier.get();
+							passedMap.put(key, entry);
+						}
+						passedPopulator.accept(entry, iteratedElement);
+					}
+					else {
+						// TODO: Additional handling?
+						System.out.println(String.format("Page with id [%d] is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
+					}
+				}
+			}
+		}
+	}
+	
+	private static QueryBuilder getCategoriesQuery() {
+		QueryBuilder categories = Queries.newWith(Queries.GET_PROPERTIES, Queries.CATEGORIES);
+		return categories;
 	}
 
 	private static QueryBuilder getRevisionsQuery() {
