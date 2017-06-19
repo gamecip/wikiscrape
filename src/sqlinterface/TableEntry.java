@@ -36,6 +36,21 @@ public class TableEntry {
 	}
 	
 	/**
+	 * Sets an entry in this {@link TableEntry} corresponding to the passed {@code int}.
+	 * <p>
+	 * The passed {@code int} can be thought of as the column number, starting at zero.
+	 * <p>
+	 * This method will do nothing if the passed index is negative or otherwise out of range.
+	 * @param passedEntryIndex - The index of the entry to set
+	 * @param passedEntryValue - The new value to set at that index
+	 */
+	public void setEntry(int passedEntryIndex, String passedEntryValue) {
+		if (validate(passedEntryIndex)) {
+			this.ENTRIES[passedEntryIndex] = passedEntryValue;
+		}
+	}
+	
+	/**
 	 * Convenience method to swap the entries at the passed indices.
 	 * <p>
 	 * This is a fix for the fact that the first column in the original tsv files is the article name, which
