@@ -73,6 +73,8 @@ public class WikiScraper {
 					
 					databaseUpdates.put(discoveredPageID, entry);
 				}
+				sqlInterface.update(entry, EnumEntry.REVISION_ID);
+				sqlInterface.update(entry, EnumEntry.TITLE);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, updateMapPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 			
@@ -87,6 +89,7 @@ public class WikiScraper {
 					categories[iterator] = categoriesString;
 				}
 				entry.setEntry(EnumEntry.CATEGORIES, ScrapeUtilities.concatenateArguments(categories)); // Concatenate using "|" sandwiched between
+				sqlInterface.update(entry, EnumEntry.CATEGORIES);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
@@ -95,6 +98,7 @@ public class WikiScraper {
 			BiConsumer<TableEntry, JsonObject> extractsPopulator = (entry, object) -> {
 				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
 				entry.setEntry(EnumEntry.TEXT_FULL, extracts);
+				sqlInterface.update(entry, EnumEntry.TEXT_INTRO);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_WHOLE_ARTICLE_EXTRACTS);
 			
@@ -103,13 +107,9 @@ public class WikiScraper {
 			BiConsumer<TableEntry, JsonObject> introtextPopulator = (entry, object) -> {
 				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
 				entry.setEntry(EnumEntry.TEXT_INTRO, extracts);
+				sqlInterface.update(entry, EnumEntry.TEXT_INTRO);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, introtextPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
-
-			// Push to database
-			for (TableEntry iteratedEntry : databaseUpdates.values()) {
-				sqlInterface.update(iteratedEntry);
-			}
 		}
 		catch (SQLException passedException) {
 			passedException.printStackTrace();
