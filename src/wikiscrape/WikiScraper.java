@@ -138,7 +138,6 @@ public class WikiScraper {
 						}
 						else {
 							entry = passedTypeSupplier.get();
-							passedMap.put(key, entry);
 						}
 						passedPopulator.accept(entry, iteratedElement);
 					}
