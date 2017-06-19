@@ -106,7 +106,8 @@ public class WikiScraper {
 			// Redownload intro text extracts
 			query.setOptions(getIntroTextQuery());
 			BiConsumer<TableEntry, JsonElement> introtextPopulator = (entry, element) -> {
-				
+				String extracts = element.getAsJsonObject().get(Queries.FIELD_EXTRACT).getAsString();
+				entry.setEntry(EnumEntry.TEXT_INTRO, extracts);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, introtextPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 
