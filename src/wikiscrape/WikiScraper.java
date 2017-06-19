@@ -84,7 +84,14 @@ public class WikiScraper {
 			// Redownload categories
 			query.setOptions(getCategoriesQuery());
 			BiConsumer<TableEntry, JsonElement> categoriesPopulator = (entry, element) -> {
-				//TODO: Populate TableEntry from JsonElement
+				JsonArray categoriesArray = element.getAsJsonObject().getAsJsonArray(Queries.FIELD_CATEGORIES);
+				String[] categories = new String[categoriesArray.size()];
+				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
+					String categoriesString = categoriesArray.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
+					categoriesString = categoriesString.substring("Category:".length()); // prune "Category" from each returned category "title"
+					categories[iterator] = categoriesString;
+				}
+				entry.setEntry(EnumEntry.CATEGORIES, ScrapeUtilities.concatenateArguments(categories)); // Concatenate using "|" sandwiched between
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
@@ -97,8 +104,10 @@ public class WikiScraper {
 			
 			// Redownload intro text extracts
 			query.setOptions(getIntroTextQuery());
-			// Can use same BiConsumer for extracting intro text as both return extracts in "extracts" field
-			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
+			BiConsumer<TableEntry, JsonElement> introtextPopulator = (entry, element) -> {
+				
+			};
+			populateMap(scraper, query, databaseUpdates, keyMapper, introtextPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 
 			// Push to database
 			for (TableEntry iteratedEntry : databaseUpdates.values()) {
