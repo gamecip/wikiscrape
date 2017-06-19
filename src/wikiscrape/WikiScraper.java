@@ -70,12 +70,12 @@ public class WikiScraper {
 				String discoveredPageID = element.getAsJsonObject().get(Queries.FIELD_PAGEID).getAsString();
 				String discoveredRevisionID = element.getAsJsonObject().getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
 				String storedRevisionID = updateMap.get(discoveredPageID);
-				
-				entry.setEntry(EnumEntry.PAGE_ID, discoveredPageID);
-				entry.setEntry(EnumEntry.REVISION_ID, discoveredRevisionID);
-				entry.setEntry(EnumEntry.TITLE, discoveredPageTitle);
 
 				if (!storedRevisionID.equals(discoveredRevisionID)) {
+					entry.setEntry(EnumEntry.PAGE_ID, discoveredPageID);
+					entry.setEntry(EnumEntry.REVISION_ID, discoveredRevisionID);
+					entry.setEntry(EnumEntry.TITLE, discoveredPageTitle);
+					
 					databaseUpdates.put(discoveredPageID, entry);
 				}
 			};
