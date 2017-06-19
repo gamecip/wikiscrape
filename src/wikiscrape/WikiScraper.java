@@ -30,6 +30,7 @@ public class WikiScraper {
 
 	private static final int MAX_QUERY_SIZE = 50;
 	private static final int MAX_PLAINTEXT_EXTRACTS = 20;
+	private static final int MAX_WHOLE_ARTICLE_EXTRACTS = 1;
 
 	public static void main(String[] passedArguments) {
 
@@ -89,14 +90,13 @@ public class WikiScraper {
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
-			// TODO: Major issue - english wikipedia has their whole-article extracts limit set to 1. Need to iterate over every pageID independently.
 			// Redownload text extracts
 			query.setOptions(getPagetextQuery());
 			BiConsumer<TableEntry, JsonObject> extractsPopulator = (entry, object) -> {
 				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
 				entry.setEntry(EnumEntry.TEXT_FULL, extracts);
 			};
-			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
+			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_WHOLE_ARTICLE_EXTRACTS);
 			
 			// Redownload intro text extracts
 			query.setOptions(getIntroTextQuery());
