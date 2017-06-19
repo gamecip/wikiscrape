@@ -84,14 +84,14 @@ public class WikiScraper {
 			// Redownload categories
 			query.setOptions(getCategoriesQuery());
 			BiConsumer<TableEntry, JsonElement> categoriesPopulator = (entry, element) -> {
-				
+				//TODO: Populate TableEntry from JsonElement
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
 			// Redownload extracts
 			query.setOptions(getExtractsQuery());
 			BiConsumer<TableEntry, JsonElement> extractsPopulator = (entry, element) -> {
-				
+				//TODO: Populate TableEntry from JsonElement
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 
