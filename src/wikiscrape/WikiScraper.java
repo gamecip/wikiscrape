@@ -89,6 +89,7 @@ public class WikiScraper {
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
+			// TODO: Major issue - english wikipedia has their extracts limit set to 1. Need to iterate over every pageID independently.
 			// Redownload text extracts
 			query.setOptions(getPagetextQuery());
 			BiConsumer<TableEntry, JsonObject> extractsPopulator = (entry, object) -> {
@@ -97,6 +98,7 @@ public class WikiScraper {
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 			
+			// TODO: Major issue - english wikipedia has their extracts limit set to 1. Need to iterate over every pageID independently.
 			// Redownload intro text extracts
 			query.setOptions(getIntroTextQuery());
 			BiConsumer<TableEntry, JsonObject> introtextPopulator = (entry, object) -> {
