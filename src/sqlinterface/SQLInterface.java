@@ -108,6 +108,31 @@ public class SQLInterface {
 		}
 		return null;
 	}
+	
+	/**
+	 * Updates this {@link SQLInterface} instance's table using the passed {@link TableEntry}, for only the {@link EnumEntry} specified.
+	 * <p>
+	 * Transmits a command equivalent to {@code UPDATE [table] SET [TableEntry Value] WHERE [pageid] = [TableEntry pageID]}
+	 * @param passedTableEntry The {@link TableEntry} instance to use for updating
+	 * @param passedEntryValue The column to set within the SQL database
+	 * @return The {@link ResultSet} from the command's execution.
+	 */
+	public ResultSet update(TableEntry passedTableEntry, EnumEntry passedEntryValue) {
+		// Command: UPDATE (tablename) SET (column = value) WHERE (pageid = pageid);
+		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, String.format("? = ? WHERE %s = ?", EnumEntry.PAGE_ID.getEntryName()));
+		try {
+			PreparedStatement statement = this.obtain(command);
+			statement.setString(0, passedEntryValue.getEntryName());
+			statement.setString(1, passedTableEntry.getEntry(passedEntryValue));
+			statement.setString(2, passedTableEntry.getEntry(EnumEntry.PAGE_ID));
+			return this.executeCommand(statement);
+		}
+		catch (SQLException passedException) {
+			System.out.println(String.format("Exception when attempting to send command \"%s\"", command));
+			passedException.printStackTrace();
+		}
+		return null;
+	}
 
 	/* Internal Methods */
 
