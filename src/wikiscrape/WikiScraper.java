@@ -57,6 +57,7 @@ public class WikiScraper {
 
 			HashMap<String, TableEntry> databaseUpdates = new HashMap<String, TableEntry>();
 			// TODO: Mode for discovery of new pages - use above HashMap
+			// TODO: Store "year" in TableEntry using the aforementioned mode
 			
 			// Compare Revisions
 			
