@@ -24,12 +24,14 @@ public class Queries {
 	public static final String FIELD_BATCH_COMPLETE = "batchcomplete";
 	public static final String FIELD_CONTINUE = "continue";
 	public static final String FIELD_CONTINUE_FROM = "accontinue";
+	public static final String FIELD_PAGETITLE = "title";
 	
 	// Known Actions
 	public static final String ACTION_QUERY = "action=query";
 	
 	// Known Arguments	
 	public static final Argument EXTRACTS = new Argument("extracts");
+	public static final Argument CATEGORIES = new Argument("categories");
 	
 	public static final Argument PAGES_BY_ID = new Argument(STRING_PAGEIDS, STRING_PAGEIDS);
 	public static final Argument PAGES_BY_TITLE = new Argument("titles");
