@@ -19,6 +19,27 @@ public class TableEntry {
 	}
 	
 	/**
+	 * Convenience method to swap the entries at the passed indices.
+	 * <p>
+	 * This is a fix for the fact that the first column in the original tsv files is the article name, which
+	 * is volatile and therefore should not be used as the SQL primary key.
+	 * 
+	 * @param passedFirstIndex - The index of the entry to swap with {@code passedSecondIndex}
+	 * @param passedSecondIndex - The index of the entry to swap with {@code passedFirstIndex}
+	 * @throws IllegalArgumentException If {@code passedFirstIndex} or {@code passedSecondIndex} are out of array bounds.
+	 */
+	public void swapEntries(int passedFirstIndex, int passedSecondIndex) {
+		if (!validate(passedFirstIndex) || !validate(passedSecondIndex)) {
+			throw new IllegalArgumentException("May not swap indices out of array bounds!");
+		}
+		String firstIndex = this.ENTRIES[passedFirstIndex];
+		String secondIndex = this.ENTRIES[passedSecondIndex];
+		
+		this.ENTRIES[passedFirstIndex] = secondIndex;
+		this.ENTRIES[passedSecondIndex] = firstIndex;
+	}
+	
+	/**
 	 * Returns an entry from this {@link TableEntry} corresponding to the passed {@code int}.
 	 * <p>
 	 * The passed {@code int} can be thought of as the column number, starting at zero.
@@ -51,24 +72,13 @@ public class TableEntry {
 	}
 	
 	/**
-	 * Convenience method to swap the entries at the passed indices.
-	 * <p>
-	 * This is a fix for the fact that the first column in the original tsv files is the article name, which
-	 * is volatile and therefore should not be used as the SQL primary key.
+	 * Convenience method that calls {@link #setEntry(int, String)} using {@link EnumEntry#getIndex()} as the index.
 	 * 
-	 * @param passedFirstIndex - The index of the entry to swap with {@code passedSecondIndex}
-	 * @param passedSecondIndex - The index of the entry to swap with {@code passedFirstIndex}
-	 * @throws IllegalArgumentException If {@code passedFirstIndex} or {@code passedSecondIndex} are out of array bounds.
+	 * @param passedEntry - The entry to set
+	 * @param passedEntryValue - The new value to set at that entry index
 	 */
-	public void swapEntries(int passedFirstIndex, int passedSecondIndex) {
-		if (!validate(passedFirstIndex) || !validate(passedSecondIndex)) {
-			throw new IllegalArgumentException("May not swap indices out of array bounds!");
-		}
-		String firstIndex = this.ENTRIES[passedFirstIndex];
-		String secondIndex = this.ENTRIES[passedSecondIndex];
-		
-		this.ENTRIES[passedFirstIndex] = secondIndex;
-		this.ENTRIES[passedSecondIndex] = firstIndex;
+	public void setEntry(EnumEntry passedEntry, String passedEntryValue) {
+		this.setEntry(passedEntry.getIndex(), passedEntryValue);
 	}
 	
 	/**
