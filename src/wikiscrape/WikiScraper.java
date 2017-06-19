@@ -185,6 +185,7 @@ public class WikiScraper {
 	}
 	
 	private static QueryBuilder getIntroTextQuery() {
+		// TODO: Can combine with revisions and categories query
 		QueryBuilder introText = Queries.newWith(Queries.GET_PROPERTIES, Queries.EXTRACTS);
 		QueryBuilder introTextOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.OPTION_SECTIONFORMAT_RAW));
 		introTextOptions.setOptions(Queries.OPTION_EXTRACT_INTRO);
