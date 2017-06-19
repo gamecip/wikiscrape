@@ -61,15 +61,15 @@ public class WikiScraper {
 			
 			// Compare Revisions
 			
-			Function<JsonElement, String> keyMapper = (element) -> { return element.getAsJsonObject().get(Queries.FIELD_PAGEID).getAsString(); };
+			Function<JsonObject, String> keyMapper = (object) -> { return object.get(Queries.FIELD_PAGEID).getAsString(); };
 			Supplier<TableEntry> tableEntrySupplier = () -> { return new TableEntry(new String[EnumEntry.values().length]); };
 
 			// Compare Revisions
 			query.setOptions(getRevisionsQuery());
-			BiConsumer<TableEntry, JsonElement> updateMapPopulator = (entry, element) -> {
-				String discoveredPageTitle = element.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
-				String discoveredPageID = element.getAsJsonObject().get(Queries.FIELD_PAGEID).getAsString();
-				String discoveredRevisionID = element.getAsJsonObject().getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
+			BiConsumer<TableEntry, JsonObject> updateMapPopulator = (entry, object) -> {
+				String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
+				String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
+				String discoveredRevisionID = object.getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
 				String storedRevisionID = updateMap.get(discoveredPageID);
 
 				if (!storedRevisionID.equals(discoveredRevisionID)) {
@@ -84,8 +84,8 @@ public class WikiScraper {
 			
 			// Redownload categories
 			query.setOptions(getCategoriesQuery());
-			BiConsumer<TableEntry, JsonElement> categoriesPopulator = (entry, element) -> {
-				JsonArray categoriesArray = element.getAsJsonObject().getAsJsonArray(Queries.FIELD_CATEGORIES);
+			BiConsumer<TableEntry, JsonObject> categoriesPopulator = (entry, object) -> {
+				JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
 				String[] categories = new String[categoriesArray.size()];
 				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
 					String categoriesString = categoriesArray.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
@@ -98,16 +98,16 @@ public class WikiScraper {
 
 			// Redownload text extracts
 			query.setOptions(getPagetextQuery());
-			BiConsumer<TableEntry, JsonElement> extractsPopulator = (entry, element) -> {
-				String extracts = element.getAsJsonObject().get(Queries.FIELD_EXTRACT).getAsString();
+			BiConsumer<TableEntry, JsonObject> extractsPopulator = (entry, object) -> {
+				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
 				entry.setEntry(EnumEntry.TEXT_FULL, extracts);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 			
 			// Redownload intro text extracts
 			query.setOptions(getIntroTextQuery());
-			BiConsumer<TableEntry, JsonElement> introtextPopulator = (entry, element) -> {
-				String extracts = element.getAsJsonObject().get(Queries.FIELD_EXTRACT).getAsString();
+			BiConsumer<TableEntry, JsonObject> introtextPopulator = (entry, object) -> {
+				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
 				entry.setEntry(EnumEntry.TEXT_INTRO, extracts);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, introtextPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
@@ -127,17 +127,17 @@ public class WikiScraper {
 	/**
 	 * Populates the {@code Object} instances in the passed {@link HashMap} using the passed objects.
 	 * <p>
-	 * Of particular importance is the {@link BiConsumer<T, JsonElement>} object; this should populate the passed {@link TableEntry} from the passed {@link JsonElement}.
+	 * Of particular importance is the {@link BiConsumer<T, JsonElement>} object; this should populate the passed {@link TableEntry} from the passed {@link JsonObject}.
 	 * 
 	 * @param passedWikiScraper - The {@link RequestManager} instance to use
 	 * @param passedQuery - The {@link QueryBuilder} that will be used for the query
 	 * @param passedMap - The {@link HashMap} of {@code Object<T>} instances, that will be populated and/or edited
-	 * @param passedKeyMapper - A {@link Function} that generates a single {@code Object<U>} from a single {@link JsonElement}
-	 * @param passedPopulator - A {@link BiConsumer<T, JsonElement>} object that populates a single {@code Object<T>} from a single {@link JsonElement}
+	 * @param passedKeyMapper - A {@link Function} that generates a single {@code Object<U>} from a single {@link JsonObject}
+	 * @param passedPopulator - A {@link BiConsumer<T, JsonObject>} object that populates a single {@code Object<T>} from a single {@link JsonObject}
 	 * @param passedTypeSupplier - A {@link Supplier<T>} instance to use provided the {@code Object<T>} does not already exist in {@code passedTableMap}
 	 * @param passedQueryBatchSize - The batch size to use while making queries.
 	 */
-	private static <T, U> void populateMap(RequestManager passedWikiScraper, QueryBuilder passedQuery, HashMap<U, T> passedMap, Function<JsonElement, U> passedKeyMapper, BiConsumer<T, JsonElement> passedPopulator, Supplier<T> passedTypeSupplier, int passedQueryBatchSize) {
+	private static <T, U> void populateMap(RequestManager passedWikiScraper, QueryBuilder passedQuery, HashMap<U, T> passedMap, Function<JsonObject, U> passedKeyMapper, BiConsumer<T, JsonObject> passedPopulator, Supplier<T> passedTypeSupplier, int passedQueryBatchSize) {
 		BatchIterator<String> iterator = new BatchIterator<String>(passedMap.keySet().toArray(new String[]{}), passedQueryBatchSize);
 		for (List<String> iteratedList : iterator) {
 			Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
@@ -148,7 +148,7 @@ public class WikiScraper {
 				JsonArray returnedJsonArray = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
 				for (JsonElement iteratedElement : returnedJsonArray) {
 					if (!iteratedElement.getAsJsonObject().has(Queries.FIELD_MISSING)) {
-						U key = passedKeyMapper.apply(iteratedElement);
+						U key = passedKeyMapper.apply(iteratedElement.getAsJsonObject());
 						T entry = passedMap.get(key);
 						if (passedMap.containsKey(key)) {
 							entry = passedMap.get(key);
@@ -156,7 +156,7 @@ public class WikiScraper {
 						else {
 							entry = passedTypeSupplier.get();
 						}
-						passedPopulator.accept(entry, iteratedElement);
+						passedPopulator.accept(entry, iteratedElement.getAsJsonObject());
 					}
 					else {
 						// TODO: Additional handling? What to do if page is missing?
