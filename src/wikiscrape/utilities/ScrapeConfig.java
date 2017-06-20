@@ -20,7 +20,7 @@ public class ScrapeConfig {
 	 * @return - The SQL username to use
 	 */
 	public String getUsername() {
-		return USERNAME;
+		return this.USERNAME;
 	}
 	
 	/**
@@ -29,7 +29,7 @@ public class ScrapeConfig {
 	 * @return - The password to use for the SQL database
 	 */
 	public String getPassword() {
-		return PASSWORD;
+		return this.PASSWORD;
 	}
 	
 	/**
@@ -38,7 +38,7 @@ public class ScrapeConfig {
 	 * @return - The URL to the SQL database to use
 	 */
 	public String getSQLURL() {
-		return SQL_URL;
+		return this.SQL_URL;
 	}
 	
 	/**
@@ -47,7 +47,7 @@ public class ScrapeConfig {
 	 * @return - The name of the table to use within the specified SQL database
 	 */
 	public String getTableName() {
-		return TABLENAME;
+		return this.TABLENAME;
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class ScrapeConfig {
 	 * @return - The URL of the wiki to use
 	 */
 	public String getWikiURL() {
-		return WIKI_URL;
+		return this.WIKI_URL;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ScrapeConfig {
 	 * @return - An array of all List pages to use for the scrape
 	 */
 	public String[] getListPages() {
-		return LIST_PAGES;
+		return this.LIST_PAGES;
 	}
 	
 	public void clear() {
