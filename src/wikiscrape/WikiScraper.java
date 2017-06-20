@@ -55,13 +55,16 @@ public class WikiScraper {
 			// TODO: Mode for discovery of new pages - use above HashMap
 			// TODO: Store "year" in TableEntry using the aforementioned mode
 			String[] listPageUrls = configuration.getListPages();
+			// Use links from https://en.wikipedia.org/wiki/Category:Video_games_by_year
 
 			// Compare Revisions
 			Function<JsonObject, String> keyMapper = (object) -> { return object.get(Queries.FIELD_PAGEID).getAsString(); };
 			Supplier<TableEntry> tableEntrySupplier = () -> { return new TableEntry(new String[EnumEntry.values().length]); };
 			
-			query.setOptions(getRevisionsQuery());
-			BiConsumer<TableEntry, JsonObject> updateMapPopulator = (entry, object) -> {
+			// Get Page Data
+			query.setOptions(getCombinedQuery());
+			BiConsumer<TableEntry, JsonObject> categoriesPopulator = (entry, object) -> {
+				// Get Revisions
 				String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
 				String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
 				String discoveredRevisionID = object.getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
@@ -74,14 +77,14 @@ public class WikiScraper {
 					
 					databaseUpdates.put(discoveredPageID, entry);
 				}
+				else {
+					// If the revision ID matches the stored value, assume no further changes; therefore no database upgrades needed
+					return;
+				}
 				sqlInterface.update(entry, EnumEntry.REVISION_ID);
 				sqlInterface.update(entry, EnumEntry.TITLE);
-			};
-			populateMap(scraper, query, databaseUpdates, keyMapper, updateMapPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
-			
-			// Redownload categories
-			query.setOptions(getCategoriesQuery());
-			BiConsumer<TableEntry, JsonObject> categoriesPopulator = (entry, object) -> {
+				
+				// Get Categories
 				JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
 				String[] categories = new String[categoriesArray.size()];
 				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
@@ -91,6 +94,11 @@ public class WikiScraper {
 				}
 				entry.setEntry(EnumEntry.CATEGORIES, ScrapeUtilities.concatenateArguments(categories)); // Concatenate using "|" sandwiched between
 				sqlInterface.update(entry, EnumEntry.CATEGORIES);
+				
+				// Get Intro text extracts
+				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
+				entry.setEntry(EnumEntry.TEXT_INTRO, extracts);
+				sqlInterface.update(entry, EnumEntry.TEXT_INTRO);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
@@ -99,18 +107,9 @@ public class WikiScraper {
 			BiConsumer<TableEntry, JsonObject> extractsPopulator = (entry, object) -> {
 				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
 				entry.setEntry(EnumEntry.TEXT_FULL, extracts);
-				sqlInterface.update(entry, EnumEntry.TEXT_INTRO);
+				sqlInterface.update(entry, EnumEntry.TEXT_FULL);
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_WHOLE_ARTICLE_EXTRACTS);
-			
-			// Redownload intro text extracts
-			query.setOptions(getIntroTextQuery());
-			BiConsumer<TableEntry, JsonObject> introtextPopulator = (entry, object) -> {
-				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
-				entry.setEntry(EnumEntry.TEXT_INTRO, extracts);
-				sqlInterface.update(entry, EnumEntry.TEXT_INTRO);
-			};
-			populateMap(scraper, query, databaseUpdates, keyMapper, introtextPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 		}
 		
 		catch (SQLException passedException) {
@@ -174,25 +173,13 @@ public class WikiScraper {
 		}
 	}
 	
-	private static QueryBuilder getCategoriesQuery() {
-		QueryBuilder categories = Queries.newWith(Queries.GET_PROPERTIES, Queries.CATEGORIES);
-		return categories;
-	}
-
-	private static QueryBuilder getRevisionsQuery() {
-		QueryBuilder revisions = Queries.newWith(Queries.GET_PROPERTIES, Queries.REVISIONS);
+	private static QueryBuilder getCombinedQuery() {
+		QueryBuilder query = Queries.newWith(Queries.GET_PROPERTIES, Queries.CATEGORIES, Queries.REVISIONS, Queries.EXTRACTS);
 		QueryBuilder revisionOptions = Queries.newWith(Queries.OPTION_REVISIONS, Queries.REVISION_FLAGS, Queries.REVISION_IDS, Queries.REVISION_SIZE);
-		revisions.setOptions(revisionOptions);
-		return revisions;
-	}
-	
-	private static QueryBuilder getIntroTextQuery() {
-		// TODO: Can combine with revisions and categories query
-		QueryBuilder introText = Queries.newWith(Queries.GET_PROPERTIES, Queries.EXTRACTS);
 		QueryBuilder introTextOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.OPTION_SECTIONFORMAT_RAW));
 		introTextOptions.setOptions(Queries.OPTION_EXTRACT_INTRO);
-		introText.setOptions(introTextOptions);
-		return introText;
+		query.setOptions(revisionOptions, introTextOptions);
+		return query;
 	}
 
 	private static QueryBuilder getPagetextQuery() {
