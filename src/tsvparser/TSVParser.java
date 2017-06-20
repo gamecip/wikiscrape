@@ -1,5 +1,6 @@
 package tsvparser;
 
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,27 +8,24 @@ import java.util.List;
 
 import sqlinterface.SQLInterface;
 import sqlinterface.TableEntry;
+import tsvparser.utilities.TSVConfig;
 import tsvparser.utilities.TSVUtilities;
+import wikiscrape.utilities.JsonObjectParser;
 
 public class TSVParser {
 
 	private static String TSV_EXTENSION = "tsv";
 
 	public static void main(String[] passedArguments) {
-		// Construct objects
-		String path = "";
+		
+		String configPath = "";
+		TSVConfig configuration = getConfig(configPath);
 
-		// TODO!
-		String sqlurl = "";
-		String tablename = "";
-		String username = "";
-		String password = "";
-
-		List<Path> discoveredFiles = TSVUtilities.getFilesInDirectory(path, TSV_EXTENSION);
+		List<Path> discoveredFiles = TSVUtilities.getFilesInDirectory(configuration.getDirectory(), TSV_EXTENSION);
 		List<TableEntry> generatedEntries = new ArrayList<TableEntry>();
 
 		try {
-			SQLInterface sqlInterface = new SQLInterface(sqlurl, tablename, username, password);
+			SQLInterface sqlInterface = new SQLInterface(configuration.getSQLURL(), configuration.getTableName(), configuration.getUsername(), configuration.getPassword());
 
 			// Generate entries
 			discoveredFiles.forEach(filepath -> TSVUtilities.buildEntries(generatedEntries, filepath));
@@ -40,6 +38,17 @@ public class TSVParser {
 			passedException.printStackTrace();
 			// If the SQLInterface cannot be constructed, there's no point in continuing
 			return;
+		}
+	}
+	
+	private static TSVConfig getConfig(String passedFilePath) {
+		try {
+			JsonObjectParser<TSVConfig> configReader = new JsonObjectParser<TSVConfig>(passedFilePath, TSVConfig.class);
+			return configReader.fromJson();
+		}
+		catch (FileNotFoundException passedException) {
+			passedException.printStackTrace();
+			return null;
 		}
 	}
 }
