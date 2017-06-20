@@ -54,6 +54,7 @@ public class WikiScraper {
 			HashMap<String, TableEntry> databaseUpdates = new HashMap<String, TableEntry>();
 			// TODO: Mode for discovery of new pages - use above HashMap
 			// TODO: Store "year" in TableEntry using the aforementioned mode
+			String[] listPageUrls = configuration.getListPages();
 
 			// Compare Revisions
 			Function<JsonObject, String> keyMapper = (object) -> { return object.get(Queries.FIELD_PAGEID).getAsString(); };
@@ -111,6 +112,7 @@ public class WikiScraper {
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, introtextPopulator, tableEntrySupplier, MAX_PLAINTEXT_EXTRACTS);
 		}
+		
 		catch (SQLException passedException) {
 			passedException.printStackTrace();
 			// If the SQLInterface cannot be constructed, there's no point in continuing
