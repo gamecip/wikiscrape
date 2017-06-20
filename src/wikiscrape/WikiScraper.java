@@ -65,52 +65,61 @@ public class WikiScraper {
 			query.setOptions(getCombinedQuery());
 			BiConsumer<TableEntry, JsonObject> categoriesPopulator = (entry, object) -> {
 				// Get Revisions
-				String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
-				String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
-				String discoveredRevisionID = object.getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
-				String storedRevisionID = updateMap.get(discoveredPageID);
+				if (object.has(Queries.FIELD_PAGEID) && object.has(Queries.FIELD_REVISIONS)) {
+					String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
+					String discoveredRevisionID = object.getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
+					String storedRevisionID = updateMap.get(discoveredPageID);
 
-				if (!storedRevisionID.equals(discoveredRevisionID)) {
-					entry.setEntry(EnumEntry.PAGE_ID, discoveredPageID);
-					entry.setEntry(EnumEntry.REVISION_ID, discoveredRevisionID);
+					if (!storedRevisionID.equals(discoveredRevisionID)) {
+						entry.setEntry(EnumEntry.PAGE_ID, discoveredPageID);
+						entry.setEntry(EnumEntry.REVISION_ID, discoveredRevisionID);
+						databaseUpdates.put(discoveredPageID, entry);
+
+						sqlInterface.update(entry, EnumEntry.REVISION_ID);
+					}
+					else {
+						// If the revision ID matches the stored value, assume no further changes; therefore no database upgrades needed
+						return;
+					}
+				}
+				
+				// Get Titles
+				if (object.has(Queries.FIELD_PAGETITLE)) {
+					String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
 					entry.setEntry(EnumEntry.TITLE, discoveredPageTitle);
-					
-					databaseUpdates.put(discoveredPageID, entry);
+					sqlInterface.update(entry, EnumEntry.TITLE);
 				}
-				else {
-					// If the revision ID matches the stored value, assume no further changes; therefore no database upgrades needed
-					return;
-				}
-				sqlInterface.update(entry, EnumEntry.REVISION_ID);
-				sqlInterface.update(entry, EnumEntry.TITLE);
 				
 				// Get Categories
-				/*
-				 *  TODO: MAJOR ISSUE - There is no particular consistency with how Wikipedia returns continuation data... This breaks QueryIterator badly
-				 */
-				JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
-				String[] categories = new String[categoriesArray.size()];
-				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
-					String categoriesString = categoriesArray.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
-					categoriesString = categoriesString.substring("Category:".length()); // prune "Category:" from each returned category "title"
-					categories[iterator] = categoriesString;
+				if (object.has(Queries.FIELD_CATEGORIES)) {
+					JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
+					String[] categories = new String[categoriesArray.size()];
+					for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
+						String categoriesString = categoriesArray.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
+						categoriesString = categoriesString.substring("Category:".length()); // prune "Category:" from each returned category "title"
+						categories[iterator] = categoriesString;
+					}
+					entry.setEntry(EnumEntry.CATEGORIES, ScrapeUtilities.concatenateArguments(categories)); // Concatenate using "|" sandwiched between
+					sqlInterface.update(entry, EnumEntry.CATEGORIES);
 				}
-				entry.setEntry(EnumEntry.CATEGORIES, ScrapeUtilities.concatenateArguments(categories)); // Concatenate using "|" sandwiched between
-				sqlInterface.update(entry, EnumEntry.CATEGORIES);
 				
 				// Get Intro text extracts
-				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
-				entry.setEntry(EnumEntry.TEXT_INTRO, extracts);
-				sqlInterface.update(entry, EnumEntry.TEXT_INTRO);
+				if (object.has(Queries.FIELD_EXTRACT)) {
+					String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
+					entry.setEntry(EnumEntry.TEXT_INTRO, extracts);
+					sqlInterface.update(entry, EnumEntry.TEXT_INTRO);
+				}
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, categoriesPopulator, tableEntrySupplier, MAX_QUERY_SIZE);
 
 			// Redownload text extracts
 			query.setOptions(getPagetextQuery());
 			BiConsumer<TableEntry, JsonObject> extractsPopulator = (entry, object) -> {
-				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
-				entry.setEntry(EnumEntry.TEXT_FULL, extracts);
-				sqlInterface.update(entry, EnumEntry.TEXT_FULL);
+				if (object.has(Queries.FIELD_EXTRACT)) {
+					String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
+					entry.setEntry(EnumEntry.TEXT_FULL, extracts);
+					sqlInterface.update(entry, EnumEntry.TEXT_FULL);
+				}
 			};
 			populateMap(scraper, query, databaseUpdates, keyMapper, extractsPopulator, tableEntrySupplier, MAX_WHOLE_ARTICLE_EXTRACTS);
 		}
@@ -121,6 +130,8 @@ public class WikiScraper {
 			return;
 		}
 	}
+	
+	/* Logic Methods */
 	
 	/**
 	 * Populates the {@code Object} instances in the passed {@link HashMap} using the passed objects.
