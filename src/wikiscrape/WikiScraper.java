@@ -85,6 +85,9 @@ public class WikiScraper {
 				sqlInterface.update(entry, EnumEntry.TITLE);
 				
 				// Get Categories
+				/*
+				 *  TODO: MAJOR ISSUE - There is no particular consistency with how Wikipedia returns continuation data... This breaks QueryIterator badly
+				 */
 				JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
 				String[] categories = new String[categoriesArray.size()];
 				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {

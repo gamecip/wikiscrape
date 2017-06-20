@@ -12,6 +12,10 @@ import wikiscrape.queries.QueryBuilder;
 
 /**
  * {@link Iterator} object to automatically handle the continuation of queries.
+ * 
+ * TODO: There is no particular consistency with how Wikipedia returns continued data;
+ * "continue-from" field may be "glcontinue", "clcontinue" or "accontinue". Investigate and resolve,
+ * otherwise QueryIterator is worthless.
  *
  * @author Malcolm Riley
  */
