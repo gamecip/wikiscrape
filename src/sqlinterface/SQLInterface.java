@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 /**
  * Class that provides support for several common SQL operations, using {@link TableEntry} and {@link EnumEntry} for ease of use.
- * 
+ *
  * @author Malcolm Riley
  */
 public class SQLInterface {
@@ -21,13 +21,19 @@ public class SQLInterface {
 	private static final String SYNTAX_UPDATE = "UPDATE %s SET %s";
 	private static final String SYNTAX_SELECT = "SELECT %s FROM %s";
 
-	private static final Function<EnumEntry, String> MAPPER_SELECT = (entry) -> { return "?"; };
-	private static final Function<TableEntry, String> MAPPER_INSERT = (entry) -> { return String.format("(%s)", fromTableEntry(entry)); };
-	private static final Function<TableEntry, String> MAPPER_UPDATE = (entry) -> { return String.format("%s WHERE %s", fromTableEntry(entry), String.format("%s = ?", EnumEntry.PAGE_ID.getEntryName())); };
+	private static final Function<EnumEntry, String> MAPPER_SELECT = (entry) -> {
+		return "?";
+	};
+	private static final Function<TableEntry, String> MAPPER_INSERT = (entry) -> {
+		return String.format("(%s)", fromTableEntry(entry));
+	};
+	private static final Function<TableEntry, String> MAPPER_UPDATE = (entry) -> {
+		return String.format("%s WHERE %s", fromTableEntry(entry), String.format("%s = ?", EnumEntry.PAGE_ID.getEntryName()));
+	};
 
 	/**
 	 * Constructs a new {@link SQLInterface} object using the passed parameters.
-	 * 
+	 *
 	 * @param passedDatabaseURL - The URL of the database to access
 	 * @param passedTableName - The name of the table that this {@link SQLInterface} will alter
 	 * @param passedUsername - The username to use for accessing the SQL database
@@ -41,7 +47,7 @@ public class SQLInterface {
 
 	/**
 	 * Performs a {@code SELECT} operation on this instance's table's columns specified by the passed {@link EnumEntry} instances.
-	 * 
+	 *
 	 * @param passedEntries - The columns to select from this instance's table
 	 * @return The {@link ResultSet} from the command's execution.
 	 */
@@ -65,6 +71,7 @@ public class SQLInterface {
 	 * Inserts the passed {@link TableEntry} instances into the {@link SQLInterface} instance's table.
 	 * <p>
 	 * Transmits a command equivalent to {@code INSERT INTO [table] VALUES (TableEntry ...)}
+	 *
 	 * @param passedTableEntries - The data to insert into the table
 	 * @return The {@link ResultSet} from the command's execution.
 	 */
@@ -90,11 +97,12 @@ public class SQLInterface {
 	 * Updates this {@link SQLInterface} instance's table using the passed {@link TableEntry}.
 	 * <p>
 	 * Transmits a command equivalent to {@code UPDATE [table] SET [TableEntry] WHERE [pageid] = [TableEntry pageID]}
-	 * @param passedTableEntry The {@link TableEntry} instance to use for updating
-	 * @return The {@link ResultSet} from the command's execution.
+	 *
+	 * @param passedTableEntry - The {@link TableEntry} instance to use for updating
+	 * @return - The {@link ResultSet} from the command's execution.
 	 */
 	public ResultSet update(TableEntry passedTableEntry) {
-		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, buildForEach(MAPPER_UPDATE, new TableEntry[]{passedTableEntry})) + ";";
+		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, buildForEach(MAPPER_UPDATE, new TableEntry[] { passedTableEntry })) + ";";
 		try {
 			PreparedStatement statement = this.obtain(command);
 			for (int iterator = 0; iterator < EnumEntry.values().length; iterator++) {
@@ -108,23 +116,38 @@ public class SQLInterface {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Updates this {@link SQLInterface} instance's table using the passed {@link TableEntry}, for only the {@link EnumEntry} specified.
 	 * <p>
 	 * Transmits a command equivalent to {@code UPDATE [table] SET [TableEntry Value] WHERE [pageid] = [TableEntry pageID]}
-	 * @param passedTableEntry The {@link TableEntry} instance to use for updating
-	 * @param passedEntryValue The column to set within the SQL database
+	 *
+	 * @param passedTableEntry - The {@link TableEntry} instance to use for updating
+	 * @param passedEntry - The column to set within the SQL database
 	 * @return The {@link ResultSet} from the command's execution.
 	 */
-	public ResultSet update(TableEntry passedTableEntry, EnumEntry passedEntryValue) {
+	public ResultSet update(TableEntry passedTableEntry, EnumEntry passedEntry) {
+		return this.updateRaw(passedTableEntry.getEntry(passedEntry), passedTableEntry.getEntry(EnumEntry.PAGE_ID), passedEntry);
+	}
+
+	/**
+	 * Updates this {@link SQLInterface} instance's table using the passed {@link TableEntry}, for only the {@link EnumEntry} specified.
+	 * <p>
+	 * Transmits a command equivalent to {@code UPDATE [table] SET [TableEntry Value] WHERE [pageid] = [passedKey]}
+	 *
+	 * @param passedEntryValue - The value to set
+	 * @param passedKey - The key to use
+	 * @param passedEntry  - The column to set within the SQL database
+	 * @return The {@link ResultSet} from the command's execution.
+	 */
+	public ResultSet updateRaw(String passedEntryValue, String passedKey, EnumEntry passedEntry) {
 		// Command: UPDATE (tablename) SET (column = value) WHERE (pageid = pageid);
 		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, String.format("? = ? WHERE %s = ?", EnumEntry.PAGE_ID.getEntryName()));
 		try {
 			PreparedStatement statement = this.obtain(command);
-			statement.setString(0, passedEntryValue.getEntryName());
-			statement.setString(1, passedTableEntry.getEntry(passedEntryValue));
-			statement.setString(2, passedTableEntry.getEntry(EnumEntry.PAGE_ID));
+			statement.setString(0, passedEntry.getEntryName());
+			statement.setString(1, passedEntryValue);
+			statement.setString(2, passedKey);
 			return this.executeCommand(statement);
 		}
 		catch (SQLException passedException) {
