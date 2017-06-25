@@ -29,6 +29,7 @@ public class WikiScraper {
 	private static final int MAX_QUERY_SIZE = 50;
 	private static final int MAX_PLAINTEXT_EXTRACTS = 20;
 	private static final int MAX_WHOLE_ARTICLE_EXTRACTS = 1;
+	private static final int TIMEOUT_SECONDS = 5;
 
 	public static void main(String[] passedArguments) {
 
@@ -143,7 +144,7 @@ public class WikiScraper {
 			Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
 			passedQuery.setArguments(pages);
 			
-			QueryIterator queryIterator = new QueryIterator(passedWikiScraper, passedQuery);
+			QueryIterator queryIterator = new QueryIterator(passedWikiScraper, passedQuery, TIMEOUT_SECONDS);
 			for (JsonObject returnedJson : queryIterator) {
 				JsonArray returnedJsonArray = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
 				for (JsonElement iteratedElement : returnedJsonArray) {

@@ -22,10 +22,12 @@ public class QueryIterator implements Iterator<JsonObject>, Iterable<JsonObject>
 	private QueryBuilder QUERY;
 	private JsonObject RETRIEVED_JSON;
 	private boolean REQUEST_PERFORMED;
+	private int TIMEOUT;
 
-	public QueryIterator(RequestManager passedManager, QueryBuilder passedQuery) {
+	public QueryIterator(RequestManager passedManager, QueryBuilder passedQuery, int passedTimeout) {
 		this.MANAGER_REFERENCE = passedManager;
 		this.QUERY = passedQuery;
+		this.TIMEOUT = passedTimeout;
 	}
 
 	/* Iterable Compliance Methods */
@@ -59,6 +61,12 @@ public class QueryIterator implements Iterator<JsonObject>, Iterable<JsonObject>
 		}
 		else {
 			this.RETRIEVED_JSON = this.MANAGER_REFERENCE.request(this.QUERY);
+		}
+		try {
+			Thread.sleep(this.TIMEOUT * 1000);
+		}
+		catch (InterruptedException passedException) {
+			passedException.printStackTrace();
 		}
 		return this.RETRIEVED_JSON;
 	}
