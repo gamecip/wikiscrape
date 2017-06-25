@@ -195,7 +195,7 @@ public class WikiScraper {
 	private static QueryBuilder getCombinedQuery() {
 		QueryBuilder query = Queries.newWith(Queries.GET_PROPERTIES, Queries.CATEGORIES, Queries.REVISIONS, Queries.EXTRACTS);
 		QueryBuilder revisionOptions = Queries.newWith(Queries.OPTION_REVISIONS, Queries.REVISION_FLAGS, Queries.REVISION_IDS, Queries.REVISION_SIZE);
-		QueryBuilder introTextOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.OPTION_SECTIONFORMAT_RAW));
+		QueryBuilder introTextOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.ARGUMENT_SECTIONFORMAT_RAW));
 		introTextOptions.setOptions(Queries.OPTION_EXTRACT_INTRO);
 		query.setOptions(revisionOptions, introTextOptions);
 		return query;
@@ -203,7 +203,7 @@ public class WikiScraper {
 
 	private static QueryBuilder getPagetextQuery() {
 		QueryBuilder extracts = Queries.newWith(Queries.GET_PROPERTIES, Queries.EXTRACTS);
-		QueryBuilder extractOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.OPTION_SECTIONFORMAT_RAW));
+		QueryBuilder extractOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.ARGUMENT_SECTIONFORMAT_RAW));
 		extracts.setOptions(extractOptions);
 		return extracts;
 	}
