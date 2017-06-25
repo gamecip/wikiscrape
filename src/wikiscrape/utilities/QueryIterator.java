@@ -2,39 +2,30 @@ package wikiscrape.utilities;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import wikiscrape.queries.Argument;
 import wikiscrape.queries.Queries;
 import wikiscrape.queries.QueryBuilder;
 
 /**
  * {@link Iterator} object to automatically handle the continuation of queries.
- * 
- * TODO: There is no particular consistency with how Wikipedia returns continued data;
- * "continue-from" field may be "glcontinue", "clcontinue" or "accontinue". Investigate and resolve,
- * otherwise QueryIterator is worthless.
  *
  * @author Malcolm Riley
  */
 public class QueryIterator implements Iterator<JsonObject>, Iterable<JsonObject> {
 
 	private RequestManager MANAGER_REFERENCE;
-	private QueryBuilder QUERY_ORIGINAL;
+	private QueryBuilder QUERY;
 	private JsonObject RETRIEVED_JSON;
-
-	private QueryBuilder OPTION_CONTINUE;
-	private QueryBuilder OPTION_CONTINUE_FROM;
+	private boolean REQUEST_PERFORMED;
 
 	public QueryIterator(RequestManager passedManager, QueryBuilder passedQuery) {
 		this.MANAGER_REFERENCE = passedManager;
-		this.QUERY_ORIGINAL = passedQuery;
-
-		this.OPTION_CONTINUE = Queries.OPTION_CONTINUE.clone();
-		this.OPTION_CONTINUE_FROM = Queries.OPTION_CONTINUE_FROM.clone();
-		this.OPTION_CONTINUE.setOptions(this.OPTION_CONTINUE_FROM);
+		this.QUERY = passedQuery;
 	}
 
 	/* Iterable Compliance Methods */
@@ -46,7 +37,10 @@ public class QueryIterator implements Iterator<JsonObject>, Iterable<JsonObject>
 	/* Iterator Compliance Methods */
 	@Override
 	public boolean hasNext() {
-		if (jsonIsNull(this.RETRIEVED_JSON)) {
+		if (!this.REQUEST_PERFORMED) {
+			return true;
+		}
+		else if (jsonIsNull(this.RETRIEVED_JSON)) {
 			return false;
 		}
 		return this.hasContinues();
@@ -54,33 +48,22 @@ public class QueryIterator implements Iterator<JsonObject>, Iterable<JsonObject>
 
 	@Override
 	public JsonObject next() {
-		this.updateJson();
+		this.REQUEST_PERFORMED = true;
+		if (this.hasContinues()) {
+			JsonObject continuations = getContinueElements(this.RETRIEVED_JSON);
+			Set<Entry<String, JsonElement>> entrySet = continuations.entrySet();
+			ArrayList<String> continuationStrings = new ArrayList<String>();
+			entrySet.forEach((entry) -> { continuationStrings.add(String.format("%s=%s", entry.getKey(), entry.getValue())); });
+			String postfix = ScrapeUtilities.concatenateArguments(continuationStrings.toArray(new String[]{}));
+			this.RETRIEVED_JSON = this.MANAGER_REFERENCE.requestWithPostfix(this.QUERY, postfix);
+		}
+		else {
+			this.RETRIEVED_JSON = this.MANAGER_REFERENCE.request(this.QUERY);
+		}
 		return this.RETRIEVED_JSON;
 	}
 
 	/* Internal Methods */
-
-	private void updateJson() {
-		QueryBuilder queryToDo;
-		if (this.hasContinues()) {
-			String continueString = this.RETRIEVED_JSON.getAsJsonObject(Queries.FIELD_CONTINUE).get(Queries.FIELD_CONTINUE).getAsString();
-			String continueFromString = this.RETRIEVED_JSON.getAsJsonObject(Queries.FIELD_CONTINUE_FROM).get(Queries.FIELD_CONTINUE_FROM).getAsString();
-			this.OPTION_CONTINUE.setArguments(new Argument(continueString));
-			this.OPTION_CONTINUE_FROM.setArguments(new Argument(continueFromString));
-
-			List<QueryBuilder> options = new ArrayList<QueryBuilder>(this.QUERY_ORIGINAL.getOptions());
-			options.add(this.OPTION_CONTINUE);
-			queryToDo = this.QUERY_ORIGINAL.clone().setOptions(options);
-		}
-		else {
-			queryToDo = this.QUERY_ORIGINAL;
-		}
-		this.RETRIEVED_JSON = this.MANAGER_REFERENCE.request(queryToDo);
-		if (jsonIsNull(this.RETRIEVED_JSON)) {
-			System.out.println(String.format("Null JSON returned for query: %s", queryToDo.build()));
-			this.RETRIEVED_JSON = new JsonObject(); // set retrieved JSON to be empty JsonObject, avoids null checks later
-		}
-	}
 
 	private boolean hasContinues() {
 		if (!jsonIsNull(this.RETRIEVED_JSON)) {
@@ -96,5 +79,8 @@ public class QueryIterator implements Iterator<JsonObject>, Iterable<JsonObject>
 	private static boolean jsonIsNull(JsonObject passedJsonObject) {
 		return (passedJsonObject == null) || (passedJsonObject.isJsonNull());
 	}
-
+	
+	private static JsonObject getContinueElements(JsonObject passedJsonObject) {
+		return passedJsonObject.getAsJsonObject(Queries.FIELD_CONTINUE);
+	}
 }
