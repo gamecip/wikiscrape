@@ -83,7 +83,7 @@ public class WikiScraper {
 						sqlInterface.update(entry, EnumEntry.REVISION_ID);
 					}
 					else {
-						// If the revision ID matches the stored value, assume no further changes; therefore no database upgrades needed
+						// If the revision ID matches the stored value, assume no further changes; therefore no database updates needed
 						return;
 					}
 				}
