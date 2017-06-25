@@ -48,12 +48,7 @@ public class WikiScraper {
 				String revisionID = results.getString(1);
 				updateMap.put(pageID, revisionID);
 			}
-
-			/* 
-			 * TODO: Transition from TableEntry implementation; no need to store all that data in memory (may not be possible)
-			 * 
-			 * TableEntry was convenient for TSVParser but not scalable. Perhaps only push actual values to database instead of persisting comparatively weighty TableEntry objects
-			 */
+			
 			// TODO: Mode for discovery of new pages - use above HashMap
 			// TODO: Store "year" in TableEntry using the aforementioned mode
 			ArrayList<String> updatesList = new ArrayList<String>();
