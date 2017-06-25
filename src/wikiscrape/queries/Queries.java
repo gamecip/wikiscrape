@@ -22,7 +22,6 @@ public class Queries {
 	public static final String FIELD_REVID = "revid";
 	public static final String FIELD_BATCH_COMPLETE = "batchcomplete";
 	public static final String FIELD_CONTINUE = "continue";
-	public static final String FIELD_CONTINUE_FROM = "accontinue";
 	public static final String FIELD_PAGETITLE = "title";
 	public static final String FIELD_CATEGORIES = "categories";
 	
@@ -62,7 +61,6 @@ public class Queries {
 	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", FIELD_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACT_INTRO = new QueryBuilder("exintro", FIELD_EXTRACT);
 	public static final QueryBuilder OPTION_CONTINUE = new QueryBuilder(FIELD_CONTINUE, FIELD_CONTINUE);
-	public static final QueryBuilder OPTION_CONTINUE_FROM = new QueryBuilder(FIELD_CONTINUE_FROM, FIELD_CONTINUE_FROM);
 	
 	/**
 	 * Convenience Factory method that {@link #clone()}s the passed {@link QueryBuilder} and calls {@link QueryBuilder#setOptions(QueryBuilder...)} on it.
