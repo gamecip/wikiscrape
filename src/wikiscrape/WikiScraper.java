@@ -197,14 +197,14 @@ public class WikiScraper {
 		QueryBuilder revisionOptions = Queries.newWith(Queries.OPTION_REVISIONS, Queries.REVISION_FLAGS, Queries.REVISION_IDS, Queries.REVISION_SIZE);
 		QueryBuilder introTextOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.ARGUMENT_SECTIONFORMAT_RAW));
 		introTextOptions.setOptions(Queries.OPTION_EXTRACT_INTRO);
-		query.setOptions(revisionOptions, introTextOptions);
+		query.setOptions(Queries.OPTION_FORMAT_JSON, revisionOptions, introTextOptions);
 		return query;
 	}
 
 	private static QueryBuilder getPagetextQuery() {
 		QueryBuilder extracts = Queries.newWith(Queries.GET_PROPERTIES, Queries.EXTRACTS);
 		QueryBuilder extractOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.ARGUMENT_SECTIONFORMAT_RAW));
-		extracts.setOptions(extractOptions);
+		extracts.setOptions(Queries.OPTION_FORMAT_JSON, extractOptions);
 		return extracts;
 	}
 }

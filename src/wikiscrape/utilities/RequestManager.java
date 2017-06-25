@@ -19,7 +19,7 @@ public class RequestManager {
 	private String API_STRING;
 	private String ACTION_TYPE;
 	
-	private String POSTFIX = "format=json&formatversion=2";
+	private String POSTFIX = "";
 	
 	/**
 	 * Creates a new {@link RequestManager} with the wiki-standard connection types and api strings.
