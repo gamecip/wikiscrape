@@ -77,5 +77,12 @@ public class RequestManager {
 	public void setPostfix(String passedPostfixString) {
 		this.POSTFIX = passedPostfixString;
 	}
+	
+	/**
+	 * Resets the {@code String} to be postfixed to the posted request to be an empty {@code String}.
+	 */
+	public void resetPostfix() {
+		this.POSTFIX = "";
+	}
 
 }
