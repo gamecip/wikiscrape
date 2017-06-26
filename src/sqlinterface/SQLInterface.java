@@ -20,6 +20,8 @@ public class SQLInterface {
 	private static final String SYNTAX_INSERT = "INSERT INTO %s VALUES %s";
 	private static final String SYNTAX_UPDATE = "UPDATE %s SET %s";
 	private static final String SYNTAX_SELECT = "SELECT %s FROM %s";
+	
+	private static final String EXCEPTION_STRING = "Exception when attempting to send command \"%s\"";
 
 	private static final Function<EnumEntry, String> MAPPER_SELECT = (entry) -> {
 		return "?";
@@ -61,7 +63,7 @@ public class SQLInterface {
 			return this.executeCommand(statement);
 		}
 		catch (SQLException passedException) {
-			System.out.println(String.format("Exception when attempting to send command \"%s\"", command));
+			System.out.println(String.format(EXCEPTION_STRING, command));
 			passedException.printStackTrace();
 		}
 		return null;
@@ -87,7 +89,7 @@ public class SQLInterface {
 			return this.executeCommand(statement);
 		}
 		catch (SQLException passedException) {
-			System.out.println(String.format("Exception when attempting to send command \"%s\"", command));
+			System.out.println(String.format(EXCEPTION_STRING, command));
 			passedException.printStackTrace();
 		}
 		return null;
@@ -111,7 +113,7 @@ public class SQLInterface {
 			return this.executeCommand(statement);
 		}
 		catch (SQLException passedException) {
-			System.out.println(String.format("Exception when attempting to send command \"%s\"", command));
+			System.out.println(String.format(EXCEPTION_STRING, command));
 			passedException.printStackTrace();
 		}
 		return null;
@@ -151,13 +153,37 @@ public class SQLInterface {
 			return this.executeCommand(statement);
 		}
 		catch (SQLException passedException) {
-			System.out.println(String.format("Exception when attempting to send command \"%s\"", command));
+			System.out.println(String.format(EXCEPTION_STRING, command));
 			passedException.printStackTrace();
 		}
 		return null;
 	}
 
 	/* Internal Methods */
+
+	private PreparedStatement obtain(String passedCommand) {
+		PreparedStatement statement = null;
+		try {
+			statement = this.CONNECTION.prepareStatement(passedCommand);
+			statement.closeOnCompletion();
+		}
+		catch (SQLException passedException) {
+			passedException.printStackTrace();
+		}
+		return statement;
+	}
+
+	private ResultSet executeCommand(PreparedStatement passedStatement) {
+		try {
+			return passedStatement.executeQuery();
+		}
+		catch (SQLException passedException) {
+			passedException.printStackTrace();
+			return null;
+		}
+	}
+	
+	/* Logic Methods */
 
 	private static String fromTableEntry(TableEntry passedEntry) {
 		int length = passedEntry.getEntries().length;
@@ -185,27 +211,5 @@ public class SQLInterface {
 			return builder.toString();
 		}
 		return passedMapper.apply(passedObjects[0]);
-	}
-
-	private PreparedStatement obtain(String passedCommand) {
-		PreparedStatement statement = null;
-		try {
-			statement = this.CONNECTION.prepareStatement(passedCommand);
-			statement.closeOnCompletion();
-		}
-		catch (SQLException passedException) {
-			passedException.printStackTrace();
-		}
-		return statement;
-	}
-
-	private ResultSet executeCommand(PreparedStatement passedStatement) {
-		try {
-			return passedStatement.executeQuery();
-		}
-		catch (SQLException passedException) {
-			passedException.printStackTrace();
-			return null;
-		}
 	}
 }
