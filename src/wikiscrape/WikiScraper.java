@@ -88,7 +88,7 @@ public class WikiScraper {
 		for (String iteratedString : passedCategoryPages) {
 			categoryTitleOption.setArguments(new Argument(iteratedString));
 			final BiConsumer<String, JsonObject> updatePopulator = (pageID, object) -> {
-				
+				// TODO:
 			};
 			iterateOverQuery(passedRequestManager, query, updatePopulator, Queries.FIELD_CATEGORYMEMBERS);
 		}
@@ -127,6 +127,7 @@ public class WikiScraper {
 			
 			// Get Categories
 			if (object.has(Queries.FIELD_CATEGORIES)) {
+				// TODO: Can returned categories list span multiple returned JSON files? If so, need handling for that...
 				JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
 				String[] categories = new String[categoriesArray.size()];
 				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
