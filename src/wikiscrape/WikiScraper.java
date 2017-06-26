@@ -106,7 +106,7 @@ public class WikiScraper {
 					sqlInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_INTRO);
 				}
 			};
-			updateUsing(scraper, query, updatesList, categoriesPopulator, MAX_QUERY_SIZE);
+			updateUsing(scraper, query, updatesList, categoriesPopulator, MAX_PLAINTEXT_EXTRACTS);
 
 			// Redownload text extracts
 			query.setOptions(getPagetextQuery());
