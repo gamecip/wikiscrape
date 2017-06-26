@@ -106,7 +106,7 @@ public class WikiScraper {
 					sqlInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_INTRO);
 				}
 			};
-			populateMap(scraper, query, updatesList, categoriesPopulator, MAX_QUERY_SIZE);
+			updateUsing(scraper, query, updatesList, categoriesPopulator, MAX_QUERY_SIZE);
 
 			// Redownload text extracts
 			query.setOptions(getPagetextQuery());
@@ -116,7 +116,7 @@ public class WikiScraper {
 					sqlInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_FULL);
 				}
 			};
-			populateMap(scraper, query, updatesList, extractsPopulator, MAX_WHOLE_ARTICLE_EXTRACTS);
+			updateUsing(scraper, query, updatesList, extractsPopulator, MAX_WHOLE_ARTICLE_EXTRACTS);
 			
 			// Push new revision IDs to database
 			for (String iteratedPageID : updatesList) {
@@ -135,7 +135,7 @@ public class WikiScraper {
 	
 	/* Logic Methods */
 	
-	private static void populateMap(RequestManager passedWikiScraper, QueryBuilder passedQuery, List<String> passedUpdatesList, BiConsumer<String, JsonObject> passedJSONConsumer, int passedQueryBatchSize) {
+	private static void updateUsing(RequestManager passedWikiScraper, QueryBuilder passedQuery, List<String> passedUpdatesList, BiConsumer<String, JsonObject> passedJSONConsumer, int passedQueryBatchSize) {
 		BatchIterator<String> iterator = new BatchIterator<String>(passedUpdatesList, passedQueryBatchSize);
 		for (List<String> iteratedList : iterator) {
 			Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
