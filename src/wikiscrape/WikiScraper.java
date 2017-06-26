@@ -26,7 +26,8 @@ import wikiscrape.utilities.ScrapeUtilities;
 
 public class WikiScraper {
 
-	private static final int MAX_QUERY_SIZE = 50;
+	// Unused!
+	// private static final int MAX_QUERY_SIZE = 50;
 	private static final int MAX_PLAINTEXT_EXTRACTS = 20;
 	private static final int MAX_WHOLE_ARTICLE_EXTRACTS = 1;
 	private static final int TIMEOUT_SECONDS = 5;
@@ -143,7 +144,7 @@ public class WikiScraper {
 				passedSQLInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_INTRO);
 			}
 		};
-		updatePagesUsing(passedRequestManager, passedQuery, passedUpdatesList, categoriesPopulator, MAX_PLAINTEXT_EXTRACTS);
+		updatePagesUsing(passedRequestManager, passedQuery, passedUpdatesList, categoriesPopulator, MAX_PLAINTEXT_EXTRACTS); // Since this query gets introtext extracts, use max for plaintext extracts
 	}
 	
 	private static void updateExtracts(QueryBuilder passedQuery, RequestManager passedRequestManager, SQLInterface passedSQLInterface, List<String> passedUpdatesList) {
