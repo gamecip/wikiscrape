@@ -12,7 +12,7 @@ public class ScrapeConfig {
 	private String SQL_URL;
 	private String WIKI_URL;
 	private String TABLENAME;
-	private String[] LIST_PAGES;
+	private String[] CATEGORY_PAGES;
 	
 	/**
 	 * Returns the username in the SQL database to use
@@ -65,8 +65,8 @@ public class ScrapeConfig {
 	 * 
 	 * @return - An array of all List pages to use for the scrape
 	 */
-	public String[] getListPages() {
-		return this.LIST_PAGES;
+	public String[] getCategoryPages() {
+		return this.CATEGORY_PAGES;
 	}
 	
 	public void clear() {
@@ -75,6 +75,6 @@ public class ScrapeConfig {
 		this.SQL_URL = "";
 		this.TABLENAME = "";
 		this.WIKI_URL = "";
-		this.LIST_PAGES = new String[]{};
+		this.CATEGORY_PAGES = new String[]{};
 	}
 }
