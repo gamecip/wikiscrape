@@ -40,120 +40,145 @@ public class WikiScraper {
 
 		try {
 			SQLInterface sqlInterface = new SQLInterface(configuration.getSQLURL(), configuration.getTableName(), configuration.getUsername(), configuration.getPassword());
+			HashMap<String,String> databaseMap = new HashMap<String, String>();
+			ArrayList<String> updatesList = new ArrayList<String>();
 
 			// Build page update map from database
-			ResultSet results = sqlInterface.select(EnumEntry.PAGE_ID, EnumEntry.REVISION_ID);
-			HashMap<String, String> updateMap = new HashMap<String, String>();
-			while (results.next()) {
-				String pageID = results.getString(0);
-				String revisionID = results.getString(1);
-				updateMap.put(pageID, revisionID);
-			}
+			populateDatabaseMap(databaseMap, sqlInterface);			
 			
-			// TODO: Mode for discovery of new pages - use above HashMap
-			// TODO: Store "year" in TableEntry using the aforementioned mode
-			ArrayList<String> updatesList = new ArrayList<String>();
-			String[] categoryPages = configuration.getCategoryPages();
-			// Use links from https://en.wikipedia.org/wiki/Category:Video_games_by_year
+			// Get pages from Categories listings
+			buildPagesList(scraper, configuration.getCategoryPages(), updatesList);
 
 			// Get Revisions, Titles, Categories
-			query.setOptions(getCombinedQuery());
-			BiConsumer<String, JsonObject> categoriesPopulator = (pageID, object) -> {
-				// Get Revisions
-				if (object.has(Queries.FIELD_PAGEID) && object.has(Queries.FIELD_REVISIONS)) {
-					String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
-					String discoveredRevisionID = object.getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
-					String storedRevisionID = updateMap.get(discoveredPageID);
-
-					if (!storedRevisionID.equals(discoveredRevisionID)) {
-						/* 
-						 * Defer revision ID push to database until very end.
-						 * 
-						 * Reason: if there's an issue and the app crashes and the RevisionID is stored before scrape completes, the database will have
-						 * old data keyed to the new revision ID.
-						 */
-						updateMap.put(pageID, discoveredRevisionID);
-						updatesList.add(discoveredPageID);
-					}
-					else {
-						// If the revision ID matches the stored value, assume no further changes; therefore no database updates needed
-						return;
-					}
-				}
-				
-				// Get Titles
-				if (object.has(Queries.FIELD_PAGETITLE)) {
-					String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
-					sqlInterface.updateRaw(discoveredPageTitle, pageID, EnumEntry.TITLE);
-				}
-				
-				// Get Categories
-				if (object.has(Queries.FIELD_CATEGORIES)) {
-					JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
-					String[] categories = new String[categoriesArray.size()];
-					for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
-						String categoriesString = categoriesArray.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
-						categoriesString = categoriesString.substring("Category:".length()); // prune "Category:" from each returned category "title"
-						categories[iterator] = categoriesString;
-					}
-					String concatenatedCategories = ScrapeUtilities.concatenateArguments(categories); // Concatenate using "|" sandwiched between
-					sqlInterface.updateRaw(concatenatedCategories, pageID, EnumEntry.CATEGORIES);
-				}
-				
-				// Get Intro text extracts
-				if (object.has(Queries.FIELD_EXTRACT)) {
-					String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
-					sqlInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_INTRO);
-				}
-			};
-			updateUsing(scraper, query, updatesList, categoriesPopulator, MAX_PLAINTEXT_EXTRACTS);
+			updatePageData(query, scraper, sqlInterface, updatesList, databaseMap);
 
 			// Redownload text extracts
-			query.setOptions(getPagetextQuery());
-			BiConsumer<String, JsonObject> extractsPopulator = (pageID, object) -> {
-				if (object.has(Queries.FIELD_EXTRACT)) {
-					String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
-					sqlInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_FULL);
-				}
-			};
-			updateUsing(scraper, query, updatesList, extractsPopulator, MAX_WHOLE_ARTICLE_EXTRACTS);
+			updateExtracts(query, scraper, sqlInterface, updatesList);
 			
 			// Push new revision IDs to database
 			for (String iteratedPageID : updatesList) {
-				if (updateMap.containsKey(iteratedPageID)) {
-					sqlInterface.updateRaw(updateMap.get(iteratedPageID), iteratedPageID, EnumEntry.REVISION_ID);
+				if (databaseMap.containsKey(iteratedPageID)) {
+					sqlInterface.updateRaw(databaseMap.get(iteratedPageID), iteratedPageID, EnumEntry.REVISION_ID);
 				}
 			}
 		}
 		
 		catch (SQLException passedException) {
 			passedException.printStackTrace();
-			// If the SQLInterface cannot be constructed, there's no point in continuing
-			return;
+			return; // If the SQLInterface fails, there's no point in continuing
 		}
 	}
 	
 	/* Logic Methods */
 	
-	private static void updateUsing(RequestManager passedWikiScraper, QueryBuilder passedQuery, List<String> passedUpdatesList, BiConsumer<String, JsonObject> passedJSONConsumer, int passedQueryBatchSize) {
+	private static void populateDatabaseMap(HashMap<String,String> passedDatabaseMap, SQLInterface passedSQLInterface) throws SQLException {
+		ResultSet results = passedSQLInterface.select(EnumEntry.PAGE_ID, EnumEntry.REVISION_ID);
+		while (results.next()) {
+			String pageID = results.getString(0);
+			String revisionID = results.getString(1);
+			passedDatabaseMap.put(pageID, revisionID);
+		}
+	}
+	
+	private static void buildPagesList(RequestManager passedRequestManager, String[] passedCategoryPages, List<String> passedUpdatesList) {
+		// Use links from https://en.wikipedia.org/wiki/Category:Video_games_by_year
+		QueryBuilder query = Queries.LIST_CATEGORYMEMBERS;
+		QueryBuilder categoryTitleOption = new QueryBuilder(Queries.ARGUMENT_CATEGORYMEMBERS_TITLE);
+		for (String iteratedString : passedCategoryPages) {
+			categoryTitleOption.setArguments(new Argument(iteratedString));
+			final BiConsumer<String, JsonObject> updatePopulator = (pageID, object) -> {
+				
+			};
+			iterateOverQuery(passedRequestManager, query, updatePopulator);
+		}
+	}
+	
+	private static void updatePageData(QueryBuilder passedQuery, RequestManager passedRequestManager, SQLInterface passedSQLInterface, List<String> passedUpdatesList, HashMap<String,String> passedDatabaseMap) {
+		passedQuery.setOptions(getCombinedQuery());
+		final BiConsumer<String, JsonObject> categoriesPopulator = (pageID, object) -> {
+			// Get Revisions
+			if (object.has(Queries.FIELD_PAGEID) && object.has(Queries.FIELD_REVISIONS)) {
+				String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
+				String discoveredRevisionID = object.getAsJsonArray(Queries.FIELD_REVISIONS).get(0).getAsJsonObject().get(Queries.FIELD_REVID).getAsString();
+				String storedRevisionID = passedDatabaseMap.get(discoveredPageID);
+
+				if (!storedRevisionID.equals(discoveredRevisionID)) {
+					/* 
+					 * Defer revision ID push to database until very end.
+					 * 
+					 * Reason: if there's an issue and the app crashes and the RevisionID is stored before scrape completes, the database will have
+					 * old data keyed to the new revision ID.
+					 */
+					passedDatabaseMap.put(pageID, discoveredRevisionID);
+					passedUpdatesList.add(discoveredPageID);
+				}
+				else {
+					// If the revision ID matches the stored value, assume no further changes; therefore no database updates needed
+					return;
+				}
+			}
+			
+			// Get Titles
+			if (object.has(Queries.FIELD_PAGETITLE)) {
+				String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
+				passedSQLInterface.updateRaw(discoveredPageTitle, pageID, EnumEntry.TITLE);
+			}
+			
+			// Get Categories
+			if (object.has(Queries.FIELD_CATEGORIES)) {
+				JsonArray categoriesArray = object.getAsJsonArray(Queries.FIELD_CATEGORIES);
+				String[] categories = new String[categoriesArray.size()];
+				for (int iterator = 0; iterator < categoriesArray.size(); iterator++) {
+					String categoriesString = categoriesArray.getAsJsonObject().get(Queries.FIELD_PAGETITLE).getAsString();
+					categoriesString = categoriesString.substring("Category:".length()); // prune "Category:" from each returned category "title"
+					categories[iterator] = categoriesString;
+				}
+				String concatenatedCategories = ScrapeUtilities.concatenateArguments(categories); // Concatenate using "|" sandwiched between
+				passedSQLInterface.updateRaw(concatenatedCategories, pageID, EnumEntry.CATEGORIES);
+			}
+			
+			// Get Intro text extracts
+			if (object.has(Queries.FIELD_EXTRACT)) {
+				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
+				passedSQLInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_INTRO);
+			}
+		};
+		updatePagesUsing(passedRequestManager, passedQuery, passedUpdatesList, categoriesPopulator, MAX_PLAINTEXT_EXTRACTS);
+	}
+	
+	private static void updateExtracts(QueryBuilder passedQuery, RequestManager passedRequestManager, SQLInterface passedSQLInterface, List<String> passedUpdatesList) {
+		passedQuery.setOptions(getPagetextQuery());
+		final BiConsumer<String, JsonObject> extractsPopulator = (pageID, object) -> {
+			if (object.has(Queries.FIELD_EXTRACT)) {
+				String extracts = object.get(Queries.FIELD_EXTRACT).getAsString();
+				passedSQLInterface.updateRaw(extracts, pageID, EnumEntry.TEXT_FULL);
+			}
+		};
+		updatePagesUsing(passedRequestManager, passedQuery, passedUpdatesList, extractsPopulator, MAX_WHOLE_ARTICLE_EXTRACTS);
+	}
+	
+	private static void updatePagesUsing(RequestManager passedRequestManager, QueryBuilder passedQuery, List<String> passedUpdatesList, BiConsumer<String, JsonObject> passedJSONConsumer, int passedQueryBatchSize) {
 		BatchIterator<String> iterator = new BatchIterator<String>(passedUpdatesList, passedQueryBatchSize);
 		for (List<String> iteratedList : iterator) {
 			Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
 			passedQuery.setArguments(pages);
-			
-			QueryIterator queryIterator = new QueryIterator(passedWikiScraper, passedQuery, TIMEOUT_SECONDS);
-			for (JsonObject returnedJson : queryIterator) {
-				JsonArray returnedJsonArray = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
-				for (JsonElement iteratedElement : returnedJsonArray) {
-					JsonObject object = iteratedElement.getAsJsonObject();
-					if (!object.has(Queries.FIELD_MISSING)) {
-						String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
-						passedJSONConsumer.accept(discoveredPageID, object);
-					}
-					else {
-						// TODO: Additional handling? What to do if page is missing?
-						System.out.println(String.format("Page with id [%d] is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
-					}
+			iterateOverQuery(passedRequestManager, passedQuery, passedJSONConsumer);
+		}
+	}
+	
+	private static void iterateOverQuery(RequestManager passedRequestManager, QueryBuilder passedQuery, BiConsumer<String, JsonObject> passedJSONConsumer) {
+		QueryIterator queryIterator = new QueryIterator(passedRequestManager, passedQuery, TIMEOUT_SECONDS);
+		for (JsonObject returnedJson : queryIterator) {
+			JsonArray returnedJsonArray = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
+			for (JsonElement iteratedElement : returnedJsonArray) {
+				JsonObject object = iteratedElement.getAsJsonObject();
+				if (!object.has(Queries.FIELD_MISSING)) {
+					String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
+					passedJSONConsumer.accept(discoveredPageID, object);
+				}
+				else {
+					// TODO: Additional handling? What to do if page is missing?
+					System.out.println(String.format("Page with id [%d] is missing!", iteratedElement.getAsJsonObject().get(Queries.FIELD_PAGEID)));
 				}
 			}
 		}
