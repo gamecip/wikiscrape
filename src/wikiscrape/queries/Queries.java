@@ -44,8 +44,9 @@ public class Queries {
 	public static final Argument ARGUMENT_SECTIONFORMAT_WIKI = new Argument("wiki", FIELD_EXTRACT);
 	public static final Argument ARGUMENT_SECTIONFORMAT_RAW = new Argument("raw", FIELD_EXTRACT);
 	public static final Argument ARGUMENT_INDEX_PAGEIDS = new Argument("indexpageids", FIELD_PAGEIDS);
-	public static final Argument ARGUMENT_FORMAT_JSON = new Argument("format", "json");
-	public static final Argument ARGUMENT_FORMATVERSION_2 = new Argument("formatversion", "2");
+	public static final Argument ARGUMENT_FORMAT = new Argument("format");
+	public static final Argument ARGUMENT_FORMAT_JSON = new Argument("json");
+	public static final Argument ARGUMENT_FORMATVERSION = new Argument("formatversion");
 	
 	public static final Argument REVISIONS = new Argument(FIELD_REVISIONS, FIELD_REVISIONS);
 	
@@ -54,7 +55,7 @@ public class Queries {
 	public static final QueryBuilder GET_PROPERTIES = new QueryBuilder(new Argument(FIELD_PROPERTIES));
 	
 	// Optional Queries - Clone these
-	public static final QueryBuilder OPTION_FORMAT_JSON = new QueryBuilder(ARGUMENT_FORMAT_JSON).setOptions(new QueryBuilder(ARGUMENT_FORMATVERSION_2));
+	public static final QueryBuilder OPTION_FORMAT_JSON = new QueryBuilder(ARGUMENT_FORMAT).setArguments(ARGUMENT_FORMAT_JSON).setOptions(new QueryBuilder(ARGUMENT_FORMATVERSION).setArguments(new Argument("2")));
 	public static final QueryBuilder OPTION_REVISIONS = new QueryBuilder("rvprop", FIELD_REVISIONS);
 	public static final QueryBuilder OPTION_SECTIONFORMAT = new QueryBuilder("exsectionformat", FIELD_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACTLIMIT = new QueryBuilder("exlimit", FIELD_EXTRACT);
