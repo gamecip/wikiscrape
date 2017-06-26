@@ -89,7 +89,7 @@ public class WikiScraper {
 			final BiConsumer<String, JsonObject> updatePopulator = (pageID, object) -> {
 				
 			};
-			iterateOverQuery(passedRequestManager, query, updatePopulator);
+			iterateOverQuery(passedRequestManager, query, updatePopulator, Queries.FIELD_CATEGORYMEMBERS);
 		}
 	}
 	
@@ -157,19 +157,44 @@ public class WikiScraper {
 		updatePagesUsing(passedRequestManager, passedQuery, passedUpdatesList, extractsPopulator, MAX_WHOLE_ARTICLE_EXTRACTS);
 	}
 	
+	/**
+	 * Method to automatically iterate over PageID-keyed results provided by the passed {@link QueryBuilder} instance.
+	 * <p>
+	 * It is up to the passed {@link BiConsumer<String, JsonObject>} to perform any operations necessary
+	 * per element in the array; one call to {@link BiConsumer#accept(Object, Object)} is performed per element in the greater JSON object. Whatever the program needs to do with the data in the
+	 * JSON element in the array needs to happen in that {@link BiConsumer<String, JsonObject>}.
+	 * 
+	 * @param passedRequestManager - The {@link RequestManager} instance to use for the operation
+	 * @param passedQuery - The {@link QueryBuilder} to use for querying
+	 * @param passedUpdatesList - A {@link List<String>} containing all the PageIDs that require updates
+	 * @param passedJSONConsumer - A {@link BiConsumer<String, JsonObject>} that will operate on each returned element in the greater returned JSON object
+	 * @param passedQueryBatchSize - The number of PageIDs to poll for each query
+	 */
 	private static void updatePagesUsing(RequestManager passedRequestManager, QueryBuilder passedQuery, List<String> passedUpdatesList, BiConsumer<String, JsonObject> passedJSONConsumer, int passedQueryBatchSize) {
 		BatchIterator<String> iterator = new BatchIterator<String>(passedUpdatesList, passedQueryBatchSize);
 		for (List<String> iteratedList : iterator) {
 			Argument[] pages = ScrapeUtilities.fromStrings(iteratedList);
 			passedQuery.setArguments(pages);
-			iterateOverQuery(passedRequestManager, passedQuery, passedJSONConsumer);
+			iterateOverQuery(passedRequestManager, passedQuery, passedJSONConsumer, Queries.FIELD_PAGES);
 		}
 	}
 	
-	private static void iterateOverQuery(RequestManager passedRequestManager, QueryBuilder passedQuery, BiConsumer<String, JsonObject> passedJSONConsumer) {
+	/**
+	 * Method to automatically iterated over a JSON array returned within another JSON object. 
+	 * <p>
+	 * It is up to the passed {@link BiConsumer<String, JsonObject>} to perform any operations necessary
+	 * per element in the array; one call to {@link BiConsumer#accept(Object, Object)} is performed per element in the greater JSON object. Whatever the program needs to do with the data in the
+	 * JSON element in the array needs to happen in that {@link BiConsumer<String, JsonObject>}.
+	 * 
+	 * @param passedRequestManager - The {@link RequestManager} instance to use for the operation
+	 * @param passedQuery - The {@link QueryBuilder} to use for querying
+	 * @param passedJSONConsumer - A {@link BiConsumer<String, JsonObject>} that will operate on each returned element in the greater returned JSON object
+	 * @param passedJSONArrayName - The name key of the JSON Array to operate on within the greater JSON object returned by the query specified by {@code passedQuery}.
+	 */
+	private static void iterateOverQuery(RequestManager passedRequestManager, QueryBuilder passedQuery, BiConsumer<String, JsonObject> passedJSONConsumer, String passedJSONArrayName) {
 		QueryIterator queryIterator = new QueryIterator(passedRequestManager, passedQuery, TIMEOUT_SECONDS);
 		for (JsonObject returnedJson : queryIterator) {
-			JsonArray returnedJsonArray = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(Queries.FIELD_PAGES);
+			JsonArray returnedJsonArray = returnedJson.getAsJsonObject(Queries.FIELD_QUERY).getAsJsonArray(passedJSONArrayName);
 			for (JsonElement iteratedElement : returnedJsonArray) {
 				JsonObject object = iteratedElement.getAsJsonObject();
 				if (!object.has(Queries.FIELD_MISSING)) {
@@ -184,6 +209,12 @@ public class WikiScraper {
 		}
 	}
 	
+	/**
+	 * Returns the {@link ScrapeConfig} object instance constructed from the JSON configuration file at the passed file path.
+	 * 
+	 * @param passedFilePath - The file path at which to search for the configuration file
+	 * @return A suitably instantiated {@link ScrapeConfig} instance, or null if the file failed to read.
+	 */
 	private static ScrapeConfig getConfig(String passedFilePath) {
 		try {
 			JsonObjectParser<ScrapeConfig> configReader = new JsonObjectParser<ScrapeConfig>(passedFilePath, ScrapeConfig.class);
@@ -195,6 +226,11 @@ public class WikiScraper {
 		}
 	}
 	
+	/**
+	 * Returns a {@link QueryBuilder} instance that combines requests for categories, revisions, and the page's intro text extract.
+	 * 
+	 * @return A combined query of categories, revisions, and introtext.
+	 */
 	private static QueryBuilder getCombinedQuery() {
 		QueryBuilder query = Queries.newWith(Queries.GET_PROPERTIES, Queries.CATEGORIES, Queries.REVISIONS, Queries.EXTRACTS);
 		QueryBuilder revisionOptions = Queries.newWith(Queries.OPTION_REVISIONS, Queries.REVISION_FLAGS, Queries.REVISION_IDS, Queries.REVISION_SIZE);
@@ -204,6 +240,11 @@ public class WikiScraper {
 		return query;
 	}
 
+	/**
+	 * Returns a {@link QueryBuilder} instance that requests a page's full text.
+	 * 
+	 * @return A full-text query.
+	 */
 	private static QueryBuilder getPagetextQuery() {
 		QueryBuilder extracts = Queries.newWith(Queries.GET_PROPERTIES, Queries.EXTRACTS);
 		QueryBuilder extractOptions = Queries.newWith(Queries.OPTION_EXTRACT_PLAINTEXT, Queries.newWith(Queries.OPTION_SECTIONFORMAT, Queries.ARGUMENT_SECTIONFORMAT_RAW));
