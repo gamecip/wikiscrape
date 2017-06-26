@@ -47,6 +47,9 @@ public class Queries {
 	public static final Argument ARGUMENT_FORMAT = new Argument("format");
 	public static final Argument ARGUMENT_FORMAT_JSON = new Argument("json");
 	public static final Argument ARGUMENT_FORMATVERSION = new Argument("formatversion");
+	public static final Argument ARGUMENT_LIST = new Argument("list");
+	public static final Argument ARGUMENT_LIST_CATEGORYMEMBERS = new Argument("categorymembers");
+	public static final Argument ARGUMENT_CATEGORYMEMBERS_TITLE = new Argument("cmtitle");
 	
 	public static final Argument REVISIONS = new Argument(FIELD_REVISIONS, FIELD_REVISIONS);
 	
@@ -62,6 +65,8 @@ public class Queries {
 	public static final QueryBuilder OPTION_EXTRACT_PLAINTEXT = new QueryBuilder("explaintext", FIELD_EXTRACT);
 	public static final QueryBuilder OPTION_EXTRACT_INTRO = new QueryBuilder("exintro", FIELD_EXTRACT);
 	public static final QueryBuilder OPTION_CONTINUE = new QueryBuilder(FIELD_CONTINUE, FIELD_CONTINUE);
+	
+	public static final QueryBuilder LIST_CATEGORYMEMBERS = new QueryBuilder(ARGUMENT_LIST).setArguments(ARGUMENT_LIST_CATEGORYMEMBERS);
 	
 	/**
 	 * Convenience Factory method that {@link #clone()}s the passed {@link QueryBuilder} and calls {@link QueryBuilder#setOptions(QueryBuilder...)} on it.
