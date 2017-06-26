@@ -26,6 +26,8 @@ import wikiscrape.utilities.ScrapeConfig;
 import wikiscrape.utilities.ScrapeUtilities;
 
 public class WikiScraper {
+	
+	// TODO: BIG TODO! Logging, very necessary!
 
 	// Unused!
 	// private static final int MAX_QUERY_SIZE = 50;
