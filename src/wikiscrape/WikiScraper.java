@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,13 +49,15 @@ public class WikiScraper {
 			populateDatabaseMap(databaseMap, sqlInterface);			
 			
 			// Get pages from Categories listings
-			buildPagesList(scraper, configuration.getCategoryPages(), updatesList);
+			buildPagesList(scraper, sqlInterface, configuration.getCategoryPages(), updatesList, databaseMap);
 
 			// Get Revisions, Titles, Categories
 			updatePageData(query, scraper, sqlInterface, updatesList, databaseMap);
 
 			// Redownload text extracts
 			updateExtracts(query, scraper, sqlInterface, updatesList);
+			
+			// TODO: Get "year" data into database somehow.
 			
 			// Push new revision IDs to database
 			for (String iteratedPageID : updatesList) {
@@ -81,14 +84,24 @@ public class WikiScraper {
 		}
 	}
 	
-	private static void buildPagesList(RequestManager passedRequestManager, String[] passedCategoryPages, List<String> passedUpdatesList) {
+	private static void buildPagesList(RequestManager passedRequestManager, SQLInterface passedSQLInterface, String[] passedCategoryPages, List<String> passedUpdatesList, HashMap<String,String> passedDatabaseMap) {
 		// Use links from https://en.wikipedia.org/wiki/Category:Video_games_by_year
 		QueryBuilder query = Queries.LIST_CATEGORYMEMBERS;
 		QueryBuilder categoryTitleOption = new QueryBuilder(Queries.ARGUMENT_CATEGORYMEMBERS_TITLE);
 		for (String iteratedString : passedCategoryPages) {
 			categoryTitleOption.setArguments(new Argument(iteratedString));
+			final Predicate<String> pageFilter = (pageTitle) -> {
+				// TODO: Page title filtering. Possibly add different filter modes or exclusions.
+				return true;
+			};
 			final BiConsumer<String, JsonObject> updatePopulator = (pageID, object) -> {
-				// TODO:
+				String discoveredPageID = object.get(Queries.FIELD_PAGEID).getAsString();
+				String discoveredPageTitle = object.get(Queries.FIELD_PAGETITLE).getAsString();
+				if (pageFilter.test(discoveredPageTitle)) {
+					passedUpdatesList.add(discoveredPageID);
+					passedDatabaseMap.put(discoveredPageID, "-1"); // Set "null" value; will be overwritten when page data is updated
+					passedSQLInterface.insertRaw(discoveredPageID, EnumEntry.PAGE_ID);
+				}
 			};
 			iterateOverQuery(passedRequestManager, query, updatePopulator, Queries.FIELD_CATEGORYMEMBERS);
 		}
