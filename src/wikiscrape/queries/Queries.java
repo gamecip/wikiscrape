@@ -24,6 +24,7 @@ public class Queries {
 	public static final String FIELD_CONTINUE = "continue";
 	public static final String FIELD_PAGETITLE = "title";
 	public static final String FIELD_CATEGORIES = "categories";
+	public static final String FIELD_CATEGORYMEMBERS = "categorymembers";
 	
 	// Known Actions
 	public static final String ACTION_QUERY = "action=query";
@@ -48,7 +49,7 @@ public class Queries {
 	public static final Argument ARGUMENT_FORMAT_JSON = new Argument("json");
 	public static final Argument ARGUMENT_FORMATVERSION = new Argument("formatversion");
 	public static final Argument ARGUMENT_LIST = new Argument("list");
-	public static final Argument ARGUMENT_LIST_CATEGORYMEMBERS = new Argument("categorymembers");
+	public static final Argument ARGUMENT_LIST_CATEGORYMEMBERS = new Argument(FIELD_CATEGORYMEMBERS);
 	public static final Argument ARGUMENT_CATEGORYMEMBERS_TITLE = new Argument("cmtitle");
 	
 	public static final Argument REVISIONS = new Argument(FIELD_REVISIONS, FIELD_REVISIONS);
