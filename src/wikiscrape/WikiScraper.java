@@ -53,12 +53,10 @@ public class WikiScraper {
 			// TODO: Mode for discovery of new pages - use above HashMap
 			// TODO: Store "year" in TableEntry using the aforementioned mode
 			ArrayList<String> updatesList = new ArrayList<String>();
-			String[] listPageUrls = configuration.getListPages();
+			String[] categoryPages = configuration.getCategoryPages();
 			// Use links from https://en.wikipedia.org/wiki/Category:Video_games_by_year
 
-			// Compare Revisions
-			
-			// Get Page Data
+			// Get Revisions, Titles, Categories
 			query.setOptions(getCombinedQuery());
 			BiConsumer<String, JsonObject> categoriesPopulator = (pageID, object) -> {
 				// Get Revisions
@@ -136,7 +134,6 @@ public class WikiScraper {
 	}
 	
 	/* Logic Methods */
-	
 	
 	private static void populateMap(RequestManager passedWikiScraper, QueryBuilder passedQuery, List<String> passedUpdatesList, BiConsumer<String, JsonObject> passedJSONConsumer, int passedQueryBatchSize) {
 		BatchIterator<String> iterator = new BatchIterator<String>(passedUpdatesList, passedQueryBatchSize);
