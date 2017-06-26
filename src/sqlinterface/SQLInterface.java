@@ -94,6 +94,29 @@ public class SQLInterface {
 		}
 		return null;
 	}
+	
+	/**
+	 * Inserts the passed value into the {@link EnumEntry} column in the {@link SQLInterface} instance's table.
+	 * <p>
+	 * Transmits a command equivalent to {@code INSERT INTO [table] VALUES (passedEntry = passedKey)}
+	 *
+	 * @param passedKey - The data to insert into the table
+	 * @param passedEntry - The column to use for insertion (Should be the table's primary key!)
+	 * @return The {@link ResultSet} from the command's execution.
+	 */
+	public ResultSet insertRaw(String passedKey, EnumEntry passedEntry) {
+		String command = String.format(SYNTAX_INSERT, this.TABLE_NAME, String.format("(%s = ?)", passedEntry.getEntryName())) + ";";
+		try {
+			PreparedStatement statement = this.obtain(command);
+			statement.setString(0, passedKey);
+			return this.executeCommand(statement);
+		}
+		catch (SQLException passedException) {
+			System.out.println(String.format(EXCEPTION_STRING, command));
+			passedException.printStackTrace();
+		}
+		return null;
+	}
 
 	/**
 	 * Updates this {@link SQLInterface} instance's table using the passed {@link TableEntry}.
@@ -144,7 +167,7 @@ public class SQLInterface {
 	 */
 	public ResultSet updateRaw(String passedEntryValue, String passedKey, EnumEntry passedEntry) {
 		// Command: UPDATE (tablename) SET (column = value) WHERE (pageid = pageid);
-		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, String.format("? = ? WHERE %s = ?", EnumEntry.PAGE_ID.getEntryName()));
+		String command = String.format(SYNTAX_UPDATE, this.TABLE_NAME, String.format("? = ? WHERE %s = ?", EnumEntry.PAGE_ID.getEntryName())) + ";";
 		try {
 			PreparedStatement statement = this.obtain(command);
 			statement.setString(0, passedEntry.getEntryName());
